@@ -1,7 +1,7 @@
 // screens/practice.js — Premium Practice Hub
 
 import { COACH_RESPONSES } from '../data/lessons.js';
-import { getProgress, saveProgress } from '../utils/storage.js';
+import { getProgress, saveProgress, getCoachChat, saveCoachChat } from '../utils/storage.js';
 import { showToast, fireConfetti } from '../utils/gamification.js';
 import { coachAvatar } from '../utils/illustrations.js';
 
@@ -224,8 +224,8 @@ function renderVisualizeTab() {
 }
 
 function renderCoachTab() {
-  // Load persisted chat history
-  const history = JSON.parse(localStorage.getItem('mindrep_coach_chat') || '[]');
+  // Chat history lives in progress, so it follows the athlete to any device.
+  const history = getCoachChat();
   const hasHistory = history.length > 0;
 
   return `
@@ -382,7 +382,7 @@ export function attachPracticeEvents(navigate) {
     btn.addEventListener('click', () => sendCoachMessage(btn.dataset.key));
   });
   document.getElementById('chat-clear')?.addEventListener('click', () => {
-    localStorage.removeItem('mindrep_coach_chat');
+    saveCoachChat([]);
     activeTab = 'coach';
     document.getElementById('app').innerHTML = buildPracticeHTML();
     document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.screen === 'practice'));
@@ -557,13 +557,13 @@ function sendCoachMessage(keyOrText, isUserText = false) {
     container.appendChild(coachMsg);
     container.scrollTop = container.scrollHeight;
 
-    // Persist to localStorage
-    const history = JSON.parse(localStorage.getItem('mindrep_coach_chat') || '[]');
+    // Persist to the athlete's synced progress
+    const history = [...getCoachChat()];
     history.push({ role: 'user', text: userText });
     history.push({ role: 'coach', text: response });
     // Keep last 20 messages only
     if (history.length > 20) history.splice(0, history.length - 20);
-    localStorage.setItem('mindrep_coach_chat', JSON.stringify(history));
+    saveCoachChat(history);
   }, 900);
 }
 

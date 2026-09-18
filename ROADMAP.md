@@ -6,10 +6,12 @@ codebase, updated as of the redesign/bug-fix pass on 2026-07-31.
 
 ## Current State
 
-**Stack**: Vanilla HTML/CSS/JS, no build step, no framework, no backend. Everything —
-user profile, XP, streaks, badges, journal entries, chat history — lives in
-`localStorage` on a single device/browser. There is no way to log in on a second
-device and see the same progress.
+**Stack**: Vanilla HTML/CSS/JS frontend (no build step, no framework) served by a
+FastAPI backend, with Postgres behind it, deployed on Railway. Athletes have real
+email/password accounts; profile, XP, streaks, badges, journal entries and chat
+history live in Postgres as a JSON document per athlete and follow them to any
+device. The frontend's storage API stayed synchronous — it reads an in-memory
+cache hydrated once at boot and writes back on a debounce (see README).
 
 **Content**: Modules 1–3 (9 lessons) are fully built — hook, instruction, activity,
 quiz, and tie-in sections for each, per the schema in `data/lessons.js`. Modules 4–7
@@ -48,10 +50,15 @@ teammate photos, etc.) can drop in later without restructuring the screens.
 These are honest gaps in a client-only prototype, not bugs to "fix" without more
 infrastructure:
 
-- **No accounts / no cross-device sync.** Clearing browser data wipes all progress.
-  The proposal's "SYNC" pillar (schedule-aware content) fundamentally needs a backend
-  to store a user's calendar and push content on a schedule — a static webpage can't
-  do this on its own.
+- ~~**No accounts / no cross-device sync.**~~ **Done.** Accounts, sessions and
+  server-side progress shipped with the FastAPI backend. Clearing browser data no
+  longer wipes progress. The proposal's "SYNC" pillar (schedule-aware content) is
+  now unblocked — the backend it needed exists.
+- **Progress sync is last-write-wins.** Two devices used at the same time means the
+  later write silently wins. Fine for one athlete's own progress; revisit if
+  coach/parent accounts ever write to the same document.
+- **Password reset needs a verified Resend domain.** Until one is configured, reset
+  emails only reach the Resend account owner's address.
 - **No real push notifications.** `Notification` only fires while the app tab is open
   in a browser. Actually reminding someone when the app/browser is closed requires a
   service worker + push subscription + a server to trigger the push.
@@ -60,9 +67,11 @@ infrastructure:
   as a paid differentiator needs a real model integration.
 - **No real payments.** The waitlist modal collects an email in `localStorage`; there's
   no Stripe/payment processor wired up.
-- **Demo mode isn't security.** Client-side code can never truly hide a secret. Fine
-  for showing yourself/beta testers the full app; don't rely on it to gate anything
-  that actually needs to stay behind a paywall once there are real paying users.
+- **Demo mode isn't security, and gating is still client-side.** The backend now
+  exists to make module gating real, but it doesn't do it yet: lesson content still
+  ships to every browser in `data/lessons.js`, and `locked` flags are enforced in
+  client code. Moving paid content behind an authenticated endpoint is the remaining
+  work before MindRep+ can charge anyone.
 
 ## Phase 1 — MVP Polish (now)
 
@@ -94,8 +103,10 @@ paid tier for free.
 
 The things that can't be faked client-side, roughly in the order they unblock each
 other:
-1. **Backend + accounts** — even a lightweight one (e.g. a small hosted DB + auth)
-   to enable cross-device progress and make gating real instead of client-side-fakeable
+1. ~~**Backend + accounts**~~ — **done.** FastAPI + Postgres on Railway, with
+   email/password accounts, revocable cookie sessions and password reset. Progress
+   syncs across devices. Note that *gating* is not yet real: see "Demo mode isn't
+   security" above — paid lessons still ship to the client.
 2. **Real payments** — Stripe (or similar) checkout for MindRep+, replacing today's
    waitlist-email placeholder
 3. **Schedule sync** — the proposal's actual differentiator: let athletes input
@@ -111,7 +122,11 @@ other:
 
 ## Verification Checklist
 
-Run `python3 -m http.server 8080` from `/Users/jordan/Desktop/MM` and click through:
+Run the app locally (see README.md — `uv run uvicorn app.main:app --reload`) and
+click through. Start by registering a fresh account:
+- Register → onboarding (name → sport → age) → home
+- Sign out, sign back in: progress must still be there (it comes from Postgres now,
+  not localStorage)
 - Onboarding (name → sport → age) with the new hero illustration
 - Home hero + module-journey cards (icons render, Modules 2 & 3 show as unlocked)
 - Modules screen: Modules 1–3 open and their lessons are clickable; Modules 4–7 show

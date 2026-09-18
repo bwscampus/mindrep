@@ -9,7 +9,9 @@ import { renderModules, attachModulesEvents } from './screens/modules.js';
 import { renderPractice, attachPracticeEvents } from './screens/practice.js';
 import { renderTracker, attachTrackerEvents } from './screens/tracker.js';
 import { renderAchievements, attachAchievementsEvents } from './screens/achievements.js';
-import { getUser, getProgress, saveProgress, updateStreak } from './utils/storage.js';
+import { getUser, getProgress, saveProgress, updateStreak, hydrate, onSyncError } from './utils/storage.js';
+import { api } from './utils/api.js';
+import { renderAuth, readResetTokenFromUrl, clearResetTokenFromUrl } from './screens/auth.js';
 
 // Clean line icons (currentColor strokes) for the bottom nav — no emoji,
 // no text labels. Active state is shown with a small dot underneath instead.
@@ -95,7 +97,56 @@ function renderScreen(screen, params = {}) {
 }
 
 // Boot
-function boot() {
+//
+// Order: session -> state -> screen. Nothing renders before hydrate() has
+// filled the storage cache, because every render function reads it
+// synchronously.
+async function boot() {
+  const resetToken = readResetTokenFromUrl();
+
+  if (resetToken) {
+    // A reset link was clicked. Any existing session is beside the point.
+    showAuth(resetToken);
+    return;
+  }
+
+  let session = null;
+  try {
+    session = await api.me();
+  } catch (error) {
+    renderConnectionError();
+    return;
+  }
+
+  if (!session) {
+    showAuth(null);
+    return;
+  }
+
+  await startSession();
+}
+
+function showAuth(resetToken) {
+  document.getElementById('nav-bar')?.remove();
+  renderAuth(() => { startSession(); }, resetToken);
+}
+
+/** Load the athlete's state, then hand off to onboarding or the app. */
+async function startSession() {
+  clearResetTokenFromUrl();
+
+  try {
+    await hydrate();
+  } catch (error) {
+    renderConnectionError();
+    return;
+  }
+
+  // A session that dies mid-use (password reset elsewhere, expiry) should
+  // land the athlete back on the sign-in screen rather than silently
+  // dropping their progress writes.
+  onSyncError(() => showAuth(null));
+
   const progress = getProgress();
   const updated = updateStreak(progress);
   saveProgress(updated);
@@ -109,6 +160,21 @@ function boot() {
     checkGameReminder(user);
     navigate('home');
   }
+}
+
+function renderConnectionError() {
+  document.getElementById('nav-bar')?.remove();
+  document.getElementById('app').innerHTML = `
+    <div class="onboard-wrap">
+      <div style="max-width:320px;margin:0 auto;text-align:center">
+        <div style="font-size:2.5rem;margin-bottom:12px">\u{1F4E1}</div>
+        <h2 style="font-family:'Outfit',sans-serif;font-size:1.4rem;font-weight:900;margin-bottom:8px">Can't reach MindRep</h2>
+        <p style="color:var(--muted);font-size:.9rem;margin-bottom:24px;line-height:1.5">Check your connection and try again.</p>
+        <button id="retry-boot" class="btn btn-primary btn-block">Retry</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('retry-boot')?.addEventListener('click', () => boot());
 }
 
 let reminderFired = false;

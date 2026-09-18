@@ -1,7 +1,8 @@
 // screens/achievements.js — Profile, stats, badges, share card
 
 import { BADGES } from '../data/lessons.js';
-import { storage, getProgress, saveProgress, getUser, getXPForLevel, LEVEL_NAMES } from '../utils/storage.js';
+import { storage, getProgress, saveProgress, getUser, getXPForLevel, LEVEL_NAMES, resetAll } from '../utils/storage.js';
+import { signOut } from '../utils/session.js';
 import { isAdmin, activateAdmin, deactivateAdmin, applyAdminUnlock } from '../utils/admin.js';
 import { showToast, fireConfetti } from '../utils/gamification.js';
 import { drawMindGlyph } from '../utils/illustrations.js';
@@ -218,6 +219,7 @@ export function renderAchievements(navigate) {
       </div>
 
       ${admin ? `<button class="btn btn-secondary btn-sm" id="reset-progress" style="opacity:.5;margin-bottom:8px;width:100%">🗑 Reset Progress</button>` : ''}
+      <button class="btn btn-secondary btn-sm" id="sign-out" style="width:100%;margin-bottom:8px">Sign Out</button>
       <div style="height:16px"></div>
     </div>
 
@@ -287,11 +289,21 @@ export function attachAchievementsEvents(navigate) {
   // Share progress
   document.getElementById('share-progress-btn')?.addEventListener('click', () => generateShareCard(navigate));
 
-  // Reset
-  document.getElementById('reset-progress')?.addEventListener('click', () => {
+  // Reset — clears the server copy too, not just this device
+  document.getElementById('reset-progress')?.addEventListener('click', async () => {
     if (confirm('Reset all progress? This cannot be undone.')) {
-      storage.clear(); location.reload();
+      try {
+        await resetAll();
+      } catch {
+        showToast('Could not reach the server — progress not reset', '\u26A0\uFE0F');
+        return;
+      }
+      location.reload();
     }
+  });
+
+  document.getElementById('sign-out')?.addEventListener('click', async () => {
+    await signOut();
   });
 
   // Admin trigger (5 taps)
