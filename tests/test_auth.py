@@ -156,3 +156,22 @@ async def test_password_cannot_contain_the_email(client):
     )
     assert response.status_code == 400
     assert "email address" in response.text
+
+
+async def test_forgot_password_still_202s_when_email_delivery_fails(
+    client, credentials, registered, monkeypatch
+):
+    """A broken mail provider must not become an account-enumeration oracle."""
+
+    async def exploding_send_email(to, subject, html):
+        raise RuntimeError("Resend is down / API key is wrong")
+
+    monkeypatch.setattr("app.auth.users.send_email", exploding_send_email)
+
+    known = await client.post(
+        "/api/auth/forgot-password", json={"email": credentials["email"]}
+    )
+    unknown = await client.post(
+        "/api/auth/forgot-password", json={"email": "nobody@example.com"}
+    )
+    assert known.status_code == unknown.status_code == 202

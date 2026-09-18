@@ -64,13 +64,17 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
         try:
             await send_email(user.email, subject, html)
         except EmailNotConfigured:
-            # Never surface this to the caller: the endpoint answers
-            # identically whether or not an account exists, and that must stay
-            # true even when mail is misconfigured.
             logger.error(
                 "Password reset requested for %s but email is not configured",
                 user.id,
             )
+        except Exception:
+            # Any delivery failure — bad API key, unverified domain, Resend
+            # outage — must be swallowed here. Letting it propagate would turn
+            # /forgot-password into a 500 for real accounts and a 202 for
+            # unknown ones, which hands out exactly the account-enumeration
+            # oracle the endpoint is written to avoid.
+            logger.exception("Failed to send password reset for %s", user.id)
 
     async def on_after_reset_password(
         self, user: User, request: Optional[Request] = None

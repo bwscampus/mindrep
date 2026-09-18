@@ -71,18 +71,35 @@ database row, so signing out or resetting a password revokes every device
 immediately. Athletes who used the localStorage-only version keep their
 progress: on first login it's uploaded if the account is empty.
 
-⚠️ **Password reset needs a verified Resend domain.** Without one, the default
-`onboarding@resend.dev` sender only delivers to the Resend account owner's own
-address, so nobody else can complete a reset. Set `RESEND_API_KEY` and an
-`EMAIL_FROM` on a verified domain before beta testers arrive.
+⚠️ **Password reset does not send email yet.** `RESEND_API_KEY` on the deployed
+service is the placeholder `re_PLACEHOLDER_REPLACE_ME`. The endpoint still
+answers 202 and logs the failure (deliberately — see below), but no mail goes
+out. Set a real key, and note that Resend delivers to arbitrary inboxes only
+from a **verified domain**: the default `onboarding@resend.dev` sender reaches
+only the Resend account owner's own address.
+
+`/forgot-password` always returns 202, whether or not the account exists and
+whether or not delivery succeeds. Anything else would let anyone probe which
+email addresses have accounts.
 
 ## Deploying
 
+Live at **https://mindrep-production-ad66.up.railway.app**
+
 ```bash
-railway init
-railway add --database postgres
+railway up      # from the repo root, once linked
+```
+
+The start command lives in `Procfile`: migrations run, then uvicorn starts.
+Required variables are already set on the service; to recreate the project
+elsewhere:
+
+```bash
+railway init && railway add --database postgres && railway add --service mindrep
+railway domain
 railway variables --set ENVIRONMENT=production \
   --set SECRET_KEY="$(python3 -c 'import secrets; print(secrets.token_urlsafe(48))')" \
+  --set 'DATABASE_URL=${{Postgres.DATABASE_URL}}' \
   --set RESEND_API_KEY=re_xxx --set EMAIL_FROM=noreply@yourdomain.com \
   --set PUBLIC_BASE_URL=https://<your-app>.up.railway.app \
   --set ALLOWED_HOSTS=<your-app>.up.railway.app \
