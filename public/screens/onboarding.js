@@ -3,7 +3,7 @@
 import { SPORTS, AGE_GROUPS } from '../data/lessons.js';
 import { saveUser, saveProgress, getProgress } from '../utils/storage.js';
 import { showToast } from '../utils/gamification.js';
-import { heroIllustration } from '../utils/illustrations.js';
+import { heroIllustration, mindrepMark } from '../utils/illustrations.js';
 
 export function renderOnboarding(onComplete) {
   let step = 1;
@@ -24,15 +24,14 @@ export function renderOnboarding(onComplete) {
 
   function renderStep1() {
     return `
-      <div style="animation:fadeUp .4s ease">
-        <div class="onboard-logo">MindRep</div>
-        <p style="font-size:.9rem;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;font-weight:600;margin-bottom:24px">Mental Performance · Ages 10–18</p>
-        <div style="margin-bottom:8px">${heroIllustration({ size: 160 })}</div>
-        <h2 style="font-family:'Outfit',sans-serif;font-size:1.75rem;font-weight:900;margin-bottom:12px;line-height:1.3">Train Your Mind.<br>Dominate Your Game.</h2>
+      <div style="animation:fadeUp .5s var(--ease)">
+        <div style="margin-bottom:20px">${mindrepMark({ size: 40, withWordmark: true })}</div>
+        <div style="margin-bottom:12px">${heroIllustration({ size: 140 })}</div>
+        <h2 style="font-family:var(--font-display);font-size:1.6rem;font-weight:800;letter-spacing:-0.01em;margin-bottom:12px;line-height:1.3">Train Your Mind.<br>Dominate Your Game.</h2>
         <p style="color:var(--muted);font-size:.95rem;margin-bottom:40px;line-height:1.6;max-width:320px">5-10 minute daily lessons based on elite sports psychology. Build mental toughness in 30 days.</p>
         <div style="width:100%;max-width:360px;margin:0 auto">
           <input id="name-input" type="text" placeholder="Enter your first name" value="${name}"
-            style="width:100%;background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.12);border-radius:14px;padding:18px 20px;color:var(--text);font-size:1.05rem;font-family:'Outfit',sans-serif;font-weight:600;margin-bottom:16px;transition:border-color .2s"
+            style="width:100%;background:var(--bg3);border:1.5px solid var(--border);border-radius:14px;padding:16px 18px;color:var(--text);font-size:1.02rem;font-family:var(--font-ui);font-weight:500;margin-bottom:16px;transition:border-color var(--duration-base) var(--ease)"
           />
           <button id="step1-next" class="btn btn-primary btn-block btn-lg">Get Started →</button>
         </div>
@@ -43,9 +42,9 @@ export function renderOnboarding(onComplete) {
 
   function renderStep2() {
     return `
-      <div style="animation:fadeUp .4s ease;width:100%;max-width:400px">
-        <div style="font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:8px">Step 2 of 3</div>
-        <h2 style="font-family:'Outfit',sans-serif;font-size:1.6rem;font-weight:900;margin-bottom:8px">What's your sport?</h2>
+      <div style="animation:fadeUp .5s var(--ease);width:100%;max-width:400px">
+        <div style="font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:8px">Step 2 of 3</div>
+        <h2 style="font-family:var(--font-display);font-size:1.45rem;font-weight:800;letter-spacing:-0.01em;margin-bottom:8px">What's your sport?</h2>
         <p style="color:var(--muted);font-size:.9rem;margin-bottom:24px">We'll personalize your lessons with relevant scenarios.</p>
         <div class="sport-grid">
           ${SPORTS.map(s => `
@@ -65,18 +64,18 @@ export function renderOnboarding(onComplete) {
 
   function renderStep3() {
     return `
-      <div style="animation:fadeUp .4s ease;width:100%;max-width:400px">
-        <div style="font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--teal);margin-bottom:8px">Step 3 of 3</div>
-        <h2 style="font-family:'Outfit',sans-serif;font-size:1.6rem;font-weight:900;margin-bottom:8px">How old are you?</h2>
+      <div style="animation:fadeUp .5s var(--ease);width:100%;max-width:400px">
+        <div style="font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin-bottom:8px">Step 3 of 3</div>
+        <h2 style="font-family:var(--font-display);font-size:1.45rem;font-weight:800;letter-spacing:-0.01em;margin-bottom:8px">How old are you?</h2>
         <p style="color:var(--muted);font-size:.9rem;margin-bottom:32px">This helps us set the right tone and difficulty for your lessons.</p>
         <div style="display:flex;flex-direction:column;gap:12px;width:100%;margin-bottom:32px">
           ${AGE_GROUPS.map(ag => `
             <button class="age-btn ${ageGroup === ag.id ? 'selected' : ''}" data-age="${ag.id}"
               style="display:flex;align-items:center;gap:16px;text-align:left;border-radius:14px;padding:18px 20px">
-              <span style="font-size:2rem">${ag.emoji}</span>
+              <span style="font-size:1.8rem">${ag.emoji}</span>
               <div>
-                <div style="font-weight:800;font-size:1.1rem">${ag.label}</div>
-                <div style="font-size:.8rem;color:var(--muted);font-weight:500">${ag.sublabel}</div>
+                <div style="font-weight:700;font-size:1.05rem;color:var(--text)">${ag.label}</div>
+                <div style="font-size:.8rem;color:var(--muted);font-weight:400">${ag.sublabel}</div>
               </div>
             </button>
           `).join('')}
@@ -93,8 +92,8 @@ export function renderOnboarding(onComplete) {
     if (step === 1) {
       const input = document.getElementById('name-input');
       input.addEventListener('input', e => name = e.target.value.trim());
-      input.addEventListener('focus', e => e.target.style.borderColor = 'var(--teal)');
-      input.addEventListener('blur', e => e.target.style.borderColor = 'rgba(255,255,255,.12)');
+      input.addEventListener('focus', e => e.target.style.borderColor = 'var(--accent)');
+      input.addEventListener('blur', e => e.target.style.borderColor = 'var(--border)');
       input.addEventListener('keydown', e => { if (e.key === 'Enter') goNext(); });
       document.getElementById('step1-next').addEventListener('click', goNext);
     }

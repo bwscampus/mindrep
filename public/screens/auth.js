@@ -6,7 +6,7 @@
 
 import { api, ApiError } from '../utils/api.js';
 import { showToast } from '../utils/gamification.js';
-import { heroIllustration } from '../utils/illustrations.js';
+import { heroIllustration, mindrepMark } from '../utils/illustrations.js';
 
 const MIN_PASSWORD_LENGTH = 8;
 
@@ -37,8 +37,8 @@ function friendlyError(error) {
   return detail || 'Something went wrong. Try again.';
 }
 
-const inputStyle = `width:100%;background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.12);border-radius:14px;padding:16px 18px;color:var(--text);font-size:1rem;font-family:'Outfit',sans-serif;font-weight:600;margin-bottom:12px;transition:border-color .2s`;
-const linkStyle = `background:none;border:none;color:var(--teal);font-size:.85rem;font-family:'Inter',sans-serif;cursor:pointer;padding:6px;text-decoration:underline`;
+const inputStyle = `width:100%;background:var(--bg3);border:1.5px solid var(--border);border-radius:14px;padding:16px 18px;color:var(--text);font-size:1rem;font-family:var(--font-ui);font-weight:500;margin-bottom:12px;transition:border-color var(--duration-base) var(--ease)`;
+const linkStyle = `background:none;border:none;color:var(--accent);font-size:.85rem;font-family:var(--font-body);cursor:pointer;padding:6px;text-decoration:underline`;
 
 /**
  * @param {(mode: string) => void} onAuthenticated called after a successful
@@ -114,10 +114,10 @@ export function renderAuth(onAuthenticated, resetToken = null) {
 
   function shell({ title, subtitle, fields, submit, footer }) {
     return `
-      <div style="animation:fadeUp .4s ease;width:100%;max-width:360px;margin:0 auto">
-        <div class="onboard-logo">MindRep</div>
-        <div style="margin:4px 0 16px">${heroIllustration({ size: 120 })}</div>
-        <h2 style="font-family:'Outfit',sans-serif;font-size:1.5rem;font-weight:900;margin-bottom:8px">${title}</h2>
+      <div style="animation:fadeUp .5s var(--ease);width:100%;max-width:360px;margin:0 auto">
+        <div style="margin-bottom:14px">${mindrepMark({ size: 36, withWordmark: true })}</div>
+        <div style="margin:4px 0 16px">${heroIllustration({ size: 110 })}</div>
+        <h2 style="font-family:var(--font-display);font-size:1.4rem;font-weight:800;letter-spacing:-0.01em;margin-bottom:8px">${title}</h2>
         <p style="color:var(--muted);font-size:.9rem;margin-bottom:24px;line-height:1.5">${subtitle}</p>
         <form id="auth-form" novalidate>
           ${fields}

@@ -68,7 +68,7 @@ function renderFlip(rep) {
 function renderPrompt(rep) {
   return `
     <div class="lesson-card glass" style="margin-bottom:16px">
-      <p style="font-size:.95rem;line-height:1.7;color:rgba(241,245,249,.85);margin-bottom:16px">${rep.prompt}</p>
+      <p style="font-size:.95rem;line-height:1.7;color:var(--muted2);margin-bottom:16px">${rep.prompt}</p>
       <textarea class="reflection-textarea" id="rep-input" placeholder="Type your answer..." rows="3"></textarea>
     </div>
     <button class="btn btn-primary btn-block btn-lg" id="rep-complete">Complete Rep ✓</button>
@@ -79,7 +79,7 @@ function renderBreatheRep(rep) {
   return `
     <div class="lesson-card glass text-center" style="margin-bottom:16px;padding:32px 22px">
       <div style="font-size:2.4rem;margin-bottom:14px">💨</div>
-      <p style="font-size:.95rem;line-height:1.7;color:rgba(241,245,249,.85);margin-bottom:8px">${rep.prompt}</p>
+      <p style="font-size:.95rem;line-height:1.7;color:var(--muted2);margin-bottom:8px">${rep.prompt}</p>
       <p style="font-size:.78rem;color:var(--muted)">Use the Breathe tool in Practice, then mark this done.</p>
     </div>
     <div style="display:flex;gap:10px">

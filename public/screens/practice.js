@@ -15,23 +15,30 @@ export function renderPractice(navigate, params = {}) {
   return buildPracticeHTML();
 }
 
+const PRACTICE_TAB_ICONS = {
+  breathe:   `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c3 3 3 7 0 10-3 3-3 7 0 8"/><path d="M12 21c-4-1-7-4-7-8a7 7 0 0 1 7-7"/></svg>`,
+  checklist: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="3.5" width="15" height="17" rx="2.5"/><path d="M8 9.5l1.6 1.6L13 7.7M8 16h6"/></svg>`,
+  visualize: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.2"/><circle cx="12" cy="12" r="0.8" fill="currentColor" stroke="none"/></svg>`,
+  coach:     `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 6.5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-8l-4 3.2V16.5h-1a2 2 0 0 1-2-2z"/></svg>`
+};
+
 function buildPracticeHTML() {
   const tabs = [
-    { id: 'breathe',   label: '💨 Breathe' },
-    { id: 'checklist', label: '✅ Pre-Game' },
-    { id: 'visualize', label: '🎯 Visualize' },
-    { id: 'coach',     label: '🤖 AI Coach' }
+    { id: 'breathe',   label: 'Breathe' },
+    { id: 'checklist', label: 'Pre-Game' },
+    { id: 'visualize', label: 'Visualize' },
+    { id: 'coach',     label: 'AI Coach' }
   ];
 
   return `
     <div class="screen" style="padding-top:24px">
-      <h1 style="font-family:'Outfit',sans-serif;font-size:1.75rem;font-weight:900;margin-bottom:20px">Practice Hub</h1>
+      <h1 style="font-family:var(--font-display);font-size:1.5rem;font-weight:800;letter-spacing:-0.01em;margin-bottom:20px">Practice Hub</h1>
 
       <!-- Tabs -->
       <div class="tab-bar">
         ${tabs.map(tab => `
           <button class="tab-btn ${activeTab === tab.id ? 'active' : ''}" data-tab="${tab.id}">
-            ${tab.label}
+            ${PRACTICE_TAB_ICONS[tab.id]} ${tab.label}
           </button>
         `).join('')}
       </div>
@@ -51,18 +58,17 @@ function renderBreatheTab() {
   return `
     <div style="text-align:center">
       <div class="glass" style="padding:36px 24px 28px;margin-bottom:16px;position:relative;overflow:hidden">
-        <div style="position:absolute;top:-30%;left:-10%;width:180px;height:180px;background:radial-gradient(circle,rgba(94,234,212,0.06),transparent);border-radius:50%;pointer-events:none"></div>
-        <h2 style="font-family:'Outfit',sans-serif;font-size:1.2rem;font-weight:900;margin-bottom:6px">Box Breathing</h2>
+        <h2 style="font-family:var(--font-display);font-size:1.15rem;font-weight:700;margin-bottom:6px">Box Breathing</h2>
         <p style="color:var(--muted2);font-size:.85rem;margin-bottom:32px">Used by Navy SEALs & elite athletes to calm nerves instantly.</p>
-        
+
         <!-- Premium breathing circle -->
         <div style="position:relative;display:inline-flex;align-items:center;justify-content:center;margin-bottom:24px">
           <!-- Outer ring -->
-          <div id="breath-outer-ring" style="position:absolute;width:220px;height:220px;border-radius:50%;border:1px solid rgba(94,234,212,0.12);transition:all 1s ease;pointer-events:none"></div>
+          <div id="breath-outer-ring" style="position:absolute;width:220px;height:220px;border-radius:50%;border:1px solid var(--border);transition:all 1s var(--ease);pointer-events:none"></div>
           <div class="breath-circle" id="breath-circle">Ready</div>
         </div>
 
-        <div id="breath-instruction" style="font-family:'Outfit',sans-serif;font-size:1.1rem;font-weight:700;height:32px;transition:all .4s;color:var(--muted2)">
+        <div id="breath-instruction" style="font-family:var(--font-display);font-size:1.05rem;font-weight:600;height:32px;transition:all var(--duration-slow) var(--ease);color:var(--muted2)">
           Press Start when ready
         </div>
 
@@ -86,7 +92,7 @@ function renderBreatheTab() {
 
       <!-- Pattern guide -->
       <div class="glass" style="padding:20px">
-        <div style="font-family:'Outfit',sans-serif;font-weight:800;font-size:.95rem;margin-bottom:14px">📐 The 4-4-4-4 Pattern</div>
+        <div style="font-family:var(--font-display);font-weight:700;font-size:.95rem;margin-bottom:14px">The 4-4-4-4 Pattern</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;text-align:left">
           ${[
             { phase: 'Inhale',  count: '4s', color: 'var(--teal)',   desc: 'Breathe in slowly',   emoji: '⬆️' },
@@ -94,7 +100,7 @@ function renderBreatheTab() {
             { phase: 'Exhale',  count: '4s', color: 'var(--coral)',  desc: 'Release slowly',      emoji: '⬇️' },
             { phase: 'Hold',    count: '4s', color: 'var(--purple)', desc: 'Hold at the bottom',  emoji: '⏸' }
           ].map(p => `
-            <div style="padding:12px;border-radius:10px;background:rgba(255,255,255,0.04);border:1px solid var(--border)">
+            <div style="padding:12px;border-radius:10px;background:var(--bg3);border:1px solid var(--border)">
               <div style="color:${p.color};font-weight:700;font-size:.85rem;margin-bottom:2px">${p.emoji} ${p.phase} · ${p.count}</div>
               <div style="color:var(--muted2);font-size:.75rem">${p.desc}</div>
             </div>
@@ -131,11 +137,10 @@ function renderChecklistTab() {
     <div>
       <!-- Progress header -->
       <div class="glass" style="padding:22px;margin-bottom:18px;text-align:center;position:relative;overflow:hidden">
-        <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(94,234,212,0.06),rgba(168,175,189,0.04));pointer-events:none"></div>
-        <div style="font-size:3rem;font-weight:900;font-family:'Outfit',sans-serif;color:var(--teal);line-height:1;margin-bottom:4px">${completedCount}<span style="font-size:1.5rem;opacity:.5">/${items.length}</span></div>
-        <div style="font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:14px">Pre-Game Checks Complete</div>
+        <div style="font-size:2.6rem;font-weight:800;font-family:var(--font-display);color:var(--accent);line-height:1;margin-bottom:4px">${completedCount}<span style="font-size:1.4rem;opacity:.5">/${items.length}</span></div>
+        <div style="font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:14px">Pre-Game Checks Complete</div>
         <div class="xp-bar-wrap">
-          <div class="xp-bar" style="width:${pct}%;background:${pct === 100 ? 'linear-gradient(90deg,var(--green),var(--teal))' : 'linear-gradient(90deg,var(--teal),var(--purple))'}"></div>
+          <div class="xp-bar" style="width:${pct}%;background:var(--accent)"></div>
         </div>
         ${pct === 100 ? `<div style="margin-top:10px;font-size:.8rem;font-weight:700;color:var(--green)">✓ Game Day Ready!</div>` : `<div style="margin-top:10px;font-size:.75rem;color:var(--muted)">${items.length - completedCount} remaining</div>`}
       </div>
@@ -144,11 +149,11 @@ function renderChecklistTab() {
         <div style="margin-bottom:18px">
           <div class="section-heading" style="margin-top:0;margin-bottom:10px;font-size:.9rem">${cat}</div>
           ${items.filter(it => it.category === cat).map(it => `
-            <div class="glass" style="display:flex;align-items:center;gap:14px;padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:all .2s;border-color:${todayChecklist[it.id] ? 'rgba(94,234,212,.35)' : 'var(--border)'}${todayChecklist[it.id] ? ';background:rgba(94,234,212,0.06)' : ''}"
+            <div class="glass" style="display:flex;align-items:center;gap:14px;padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:all var(--duration-base) var(--ease);border-color:${todayChecklist[it.id] ? 'rgba(62,111,196,.3)' : 'var(--border)'}${todayChecklist[it.id] ? ';background:var(--accent-dim)' : ''}"
               id="check-${it.id}">
               <div style="font-size:1.4rem">${it.emoji}</div>
               <div style="flex:1;font-size:.9rem;font-weight:600${todayChecklist[it.id] ? ';text-decoration:line-through;opacity:.6' : ''}">${it.label}</div>
-              <div style="width:26px;height:26px;border-radius:50%;border:2px solid ${todayChecklist[it.id] ? 'var(--green)' : 'var(--border)'};background:${todayChecklist[it.id] ? 'var(--green)' : 'transparent'};display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;transition:all .25s cubic-bezier(.34,1.56,.64,1)">
+              <div style="width:26px;height:26px;border-radius:50%;border:2px solid ${todayChecklist[it.id] ? 'var(--accent)' : 'var(--border)'};background:${todayChecklist[it.id] ? 'var(--accent)' : 'transparent'};color:#fff;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;transition:all var(--duration-base) var(--ease)">
                 ${todayChecklist[it.id] ? '✓' : ''}
               </div>
             </div>
@@ -157,9 +162,9 @@ function renderChecklistTab() {
       `).join('')}
 
       ${completedCount === items.length ? `
-        <div class="glass" style="text-align:center;padding:28px;border-color:rgba(168,175,189,.3);background:linear-gradient(135deg,rgba(168,175,189,0.08),transparent);margin-top:4px">
-          <div style="font-size:3rem;margin-bottom:10px">🏆</div>
-          <div style="font-family:'Outfit',sans-serif;font-weight:800;font-size:1.1rem;margin-bottom:6px">Game Day Ready!</div>
+        <div class="glass" style="text-align:center;padding:28px;border-color:var(--border);background:var(--bg2);margin-top:4px">
+          <div style="font-size:2.6rem;margin-bottom:10px">🏆</div>
+          <div style="font-family:var(--font-display);font-weight:700;font-size:1.05rem;margin-bottom:6px">Game Day Ready!</div>
           <div style="color:var(--muted2);font-size:.875rem">You've prepared your mind and body. Go dominate.</div>
         </div>
       ` : ''}
@@ -210,12 +215,12 @@ function renderVisualizeTab() {
       `).join('')}
 
       <!-- Visualization player -->
-      <div id="viz-player" style="display:none;animation:fadeUp .35s ease">
-        <div class="glass" style="padding:32px 24px;text-align:center;border-color:rgba(94,234,212,.2)">
-          <div style="font-size:3rem;margin-bottom:12px" id="viz-emoji"></div>
-          <div style="font-family:'Outfit',sans-serif;font-weight:900;font-size:1.2rem;margin-bottom:20px" id="viz-title"></div>
-          <div style="font-size:.95rem;line-height:1.85;color:rgba(241,245,249,.82);text-align:left;white-space:pre-line;margin-bottom:28px" id="viz-text"></div>
-          <div id="viz-tts-status" style="font-size:.75rem;color:var(--teal);margin-bottom:16px;display:none">🔊 Reading aloud...</div>
+      <div id="viz-player" style="display:none;animation:fadeUp var(--duration-slow) var(--ease)">
+        <div class="glass" style="padding:32px 24px;text-align:center;border-color:var(--border)">
+          <div style="font-size:2.6rem;margin-bottom:12px" id="viz-emoji"></div>
+          <div style="font-family:var(--font-display);font-weight:700;font-size:1.15rem;margin-bottom:20px" id="viz-title"></div>
+          <div style="font-size:.95rem;line-height:1.85;color:var(--muted2);text-align:left;white-space:pre-line;margin-bottom:28px" id="viz-text"></div>
+          <div id="viz-tts-status" style="font-size:.75rem;color:var(--accent);margin-bottom:16px;display:none">🔊 Reading aloud...</div>
           <button class="btn btn-primary btn-block" id="viz-close">Done ✓</button>
         </div>
       </div>
@@ -232,12 +237,12 @@ function renderCoachTab() {
     <div>
       <!-- Coach greeting card (shown when no history) -->
       ${!hasHistory ? `
-        <div class="glass" style="padding:22px;margin-bottom:16px;border-color:rgba(94,234,212,.2);background:linear-gradient(135deg,rgba(94,234,212,.07),rgba(168,175,189,.04))">
+        <div class="glass" style="padding:22px;margin-bottom:16px;border-color:var(--border);background:var(--bg2)">
           <div style="display:flex;align-items:center;gap:14px;margin-bottom:14px">
             ${coachAvatar({ size: 52 })}
             <div>
-              <div style="font-family:var(--font-display);font-weight:900;font-size:1.1rem;text-transform:uppercase;letter-spacing:.04em">Coach Neutral</div>
-              <div style="font-size:.72rem;color:var(--teal);font-family:var(--font-display);font-weight:700;letter-spacing:.08em;text-transform:uppercase">● Online · Available 24/7</div>
+              <div style="font-family:var(--font-display);font-weight:700;font-size:1.05rem;letter-spacing:-0.005em">Coach Neutral</div>
+              <div style="font-size:.72rem;color:var(--accent);font-family:var(--font-display);font-weight:600;letter-spacing:.06em;text-transform:uppercase">● Online · Available 24/7</div>
             </div>
           </div>
           <div class="coach-bubble" style="margin-bottom:0">
@@ -246,7 +251,7 @@ function renderCoachTab() {
         </div>
 
         <!-- Starter prompts -->
-        <div style="font-family:var(--font-display);font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Suggested Questions</div>
+        <div style="font-family:var(--font-display);font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">Suggested Questions</div>
         <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px">
           ${[
             { label: 'How do I reset after a bad play?',               key: 'reset'     },
@@ -254,8 +259,8 @@ function renderCoachTab() {
             { label: "I'm struggling with confidence — help.",         key: 'confidence'}
           ].map(p => `
             <button class="glass coach-quick" data-key="${p.key}"
-              style="padding:14px 16px;border-radius:8px;text-align:left;font-family:var(--font-body);font-size:.9rem;font-weight:600;color:var(--text);display:flex;align-items:center;gap:10px;border-color:rgba(94,234,212,.15);transition:all .15s">
-              <span style="color:var(--teal);font-size:1rem">→</span> ${p.label}
+              style="padding:14px 16px;border-radius:8px;text-align:left;font-family:var(--font-body);font-size:.9rem;font-weight:600;color:var(--text);display:flex;align-items:center;gap:10px;border-color:var(--border);transition:all var(--duration-fast) var(--ease)">
+              <span style="color:var(--accent);font-size:1rem">→</span> ${p.label}
             </button>
           `).join('')}
         </div>
@@ -263,10 +268,10 @@ function renderCoachTab() {
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
           ${coachAvatar({ size: 36 })}
           <div>
-            <div style="font-family:var(--font-display);font-weight:900;font-size:.9rem;text-transform:uppercase;letter-spacing:.04em">Coach Neutral</div>
-            <div style="font-size:.65rem;color:var(--teal);font-family:var(--font-display);font-weight:700;letter-spacing:.08em;text-transform:uppercase">● Online</div>
+            <div style="font-family:var(--font-display);font-weight:700;font-size:.9rem;letter-spacing:-0.005em">Coach Neutral</div>
+            <div style="font-size:.65rem;color:var(--accent);font-family:var(--font-display);font-weight:600;letter-spacing:.06em;text-transform:uppercase">● Online</div>
           </div>
-          <button id="chat-clear" style="margin-left:auto;background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-family:var(--font-display);font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);cursor:pointer">Clear</button>
+          <button id="chat-clear" style="margin-left:auto;background:none;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-family:var(--font-display);font-size:.65rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);cursor:pointer">Clear</button>
         </div>
         <!-- Render saved history -->
         <div id="chat-messages" style="margin-bottom:12px;max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:2px">
@@ -484,11 +489,11 @@ function startBreathing() {
       if (circle) {
         circle.className = 'breath-circle';
         circle.textContent = '✓';
-        circle.style.borderColor = 'var(--green)';
-        circle.style.color = 'var(--green)';
-        circle.style.boxShadow = '0 0 40px rgba(94,234,212,0.4)';
+        circle.style.borderColor = 'var(--accent)';
+        circle.style.color = 'var(--accent)';
+        circle.style.boxShadow = '0 0 24px rgba(62,111,196,0.18)';
       }
-      if (instruction) { instruction.textContent = 'Session Complete 🙌'; instruction.style.color = 'var(--green)'; }
+      if (instruction) { instruction.textContent = 'Session Complete 🙌'; instruction.style.color = 'var(--accent)'; }
       if (counter) counter.textContent = '4 cycles · Well done!';
       // Reset phase dots
       document.querySelectorAll('.breath-phase-dot').forEach(d => d.style.opacity = '1');

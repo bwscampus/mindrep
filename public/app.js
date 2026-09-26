@@ -168,7 +168,7 @@ function renderConnectionError() {
     <div class="onboard-wrap">
       <div style="max-width:320px;margin:0 auto;text-align:center">
         <div style="font-size:2.5rem;margin-bottom:12px">\u{1F4E1}</div>
-        <h2 style="font-family:'Outfit',sans-serif;font-size:1.4rem;font-weight:900;margin-bottom:8px">Can't reach MindRep</h2>
+        <h2 style="font-family:var(--font-display);font-size:1.3rem;font-weight:700;margin-bottom:8px">Can't reach MindRep</h2>
         <p style="color:var(--muted);font-size:.9rem;margin-bottom:24px;line-height:1.5">Check your connection and try again.</p>
         <button id="retry-boot" class="btn btn-primary btn-block">Retry</button>
       </div>
@@ -219,23 +219,15 @@ function fireGameReminder(user) {
   }
 
   const banner = document.createElement('div');
-  banner.style.cssText = `
-    position:fixed;top:16px;left:50%;transform:translateX(-50%);
-    z-index:9001;width:calc(100% - 32px);max-width:400px;
-    background:linear-gradient(135deg,rgba(94,234,212,0.12),rgba(168,175,189,0.08));
-    border:1px solid rgba(94,234,212,0.3);border-radius:10px;
-    padding:16px 18px;backdrop-filter:blur(20px);
-    font-family:'Barlow Condensed',sans-serif;
-    animation:fadeUp .3s ease;
-  `;
+  banner.className = 'modal-banner';
   banner.innerHTML = `
     <div style="display:flex;align-items:flex-start;gap:12px">
-      <div style="font-size:1.6rem;flex-shrink:0">🎯</div>
+      <div style="font-size:1.5rem;flex-shrink:0">🎯</div>
       <div style="flex:1">
-        <div style="font-weight:900;font-size:1rem;text-transform:uppercase;letter-spacing:.04em;color:#F1F5F9">Game Day, ${user?.name || 'Athlete'}!</div>
-        <div style="font-size:.82rem;color:rgba(241,245,249,.7);margin-top:2px;font-family:'Inter',sans-serif;line-height:1.4">Open your 3-min pre-game mental warm-up.</div>
+        <div style="font-weight:700;font-size:1rem;font-family:var(--font-display);letter-spacing:-0.005em;color:var(--text)">Game Day, ${user?.name || 'Athlete'}!</div>
+        <div style="font-size:.82rem;color:var(--muted2);margin-top:2px;font-family:var(--font-body);line-height:1.4">Open your 3-min pre-game mental warm-up.</div>
       </div>
-      <button id="reminder-banner-close" style="background:none;border:none;color:#64748B;font-size:1.1rem;cursor:pointer;padding:0 4px;flex-shrink:0">✕</button>
+      <button id="reminder-banner-close" style="background:none;border:none;color:var(--muted);font-size:1.1rem;cursor:pointer;padding:0 4px;flex-shrink:0">✕</button>
     </div>
     <button id="reminder-banner-cta" class="btn btn-primary btn-sm" style="width:100%;margin-top:12px;font-size:.8rem">Open Pre-Game Warm-Up →</button>
   `;

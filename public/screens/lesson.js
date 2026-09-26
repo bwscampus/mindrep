@@ -42,9 +42,9 @@ export function renderLesson(lessonId, navigate) {
     document.getElementById('app').innerHTML = admin
       ? `<div class="screen text-center" style="padding-top:80px">
           <div style="font-size:4rem">🚧</div>
-          <h2 style="font-family:'Outfit',sans-serif;margin:16px 0 8px">Content Coming Soon</h2>
+          <h2 style="font-family:var(--font-display);font-weight:700;margin:16px 0 8px">Content Coming Soon</h2>
           <p style="color:var(--muted);margin-bottom:8px">This lesson is in development. Full content for all 7 modules will be added progressively.</p>
-          <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(94,234,212,.1);border:1px solid rgba(94,234,212,.25);border-radius:50px;padding:8px 18px;font-size:.85rem;font-weight:700;color:var(--teal);margin-bottom:24px">⚡ Admin Mode — Lesson stub</div>
+          <div style="display:inline-flex;align-items:center;gap:8px;background:var(--accent-dim);border:1px solid rgba(62,111,196,.22);border-radius:50px;padding:8px 18px;font-size:.85rem;font-weight:600;color:var(--accent);margin-bottom:24px">⚡ Admin Mode — Lesson stub</div>
           <div style="display:flex;gap:10px;justify-content:center">
             <button class="btn btn-secondary" id="locked-back">← Back</button>
             <button class="btn btn-primary" id="locked-home">🏠 Home</button>
@@ -52,7 +52,7 @@ export function renderLesson(lessonId, navigate) {
         </div>`
       : `<div class="screen text-center" style="padding-top:80px">
           <div style="font-size:4rem">🔒</div>
-          <h2 style="font-family:'Outfit',sans-serif;margin:16px 0 8px">Premium Content</h2>
+          <h2 style="font-family:var(--font-display);font-weight:700;margin:16px 0 8px">Premium Content</h2>
           <p style="color:var(--muted)">This lesson is part of MindRep+. Upgrade to unlock Modules 4–7.</p>
           <button class="btn btn-primary mt-24" id="locked-back">← Back to Home</button>
         </div>`;
@@ -79,9 +79,9 @@ function renderSection() {
               ${moduleData.emoji} Module ${moduleData.id} · Lesson ${lessonData.id}
               <span class="time-pill">⏱ ${lessonData.duration} min</span>
             </div>
-            <div style="font-family:var(--font-display);font-weight:900;font-size:1.1rem;text-transform:uppercase;letter-spacing:.02em">${lessonData.title}</div>
+            <div style="font-family:var(--font-display);font-weight:700;font-size:1.05rem;letter-spacing:-0.005em">${lessonData.title}</div>
           </div>
-          <div style="font-family:var(--font-display);font-size:.9rem;font-weight:900;color:var(--lime);letter-spacing:.04em">+${lessonData.xp} XP</div>
+          <div style="font-family:var(--font-display);font-size:.9rem;font-weight:700;color:var(--accent);letter-spacing:0">+${lessonData.xp} XP</div>
       </div>
 
       <!-- Progress steps -->
@@ -170,7 +170,7 @@ function renderSliderActivity(section) {
         <div style="margin-bottom:20px">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
             <div style="font-weight:600;font-size:.9rem">${s.emoji} ${s.label}</div>
-            <div style="font-family:'Outfit',sans-serif;font-weight:800;color:var(--teal)" id="val-${s.id}">3</div>
+            <div style="font-family:var(--font-display);font-weight:700;color:var(--accent)" id="val-${s.id}">3</div>
           </div>
           <div class="slider-wrap">
             <span style="font-size:.75rem;color:var(--muted)">0</span>
@@ -214,15 +214,15 @@ function renderBuilderActivity(section) {
       <p style="color:var(--muted);font-size:.9rem;margin-bottom:20px">${c.description}</p>
       ${c.builder.steps.map((step, si) => `
         <div style="margin-bottom:20px">
-          <div style="font-family:'Outfit',sans-serif;font-weight:700;font-size:.85rem;color:var(--teal);margin-bottom:6px;letter-spacing:.05em;text-transform:uppercase">
+          <div style="font-family:var(--font-display);font-weight:600;font-size:.85rem;color:var(--accent);margin-bottom:6px;letter-spacing:.04em;text-transform:uppercase">
             Step ${si + 1}: ${step.step}
           </div>
           <div style="font-size:.9rem;color:var(--muted);margin-bottom:10px">${step.label}</div>
           <div style="display:flex;flex-direction:column;gap:8px">
             ${step.options.map((opt, oi) => `
-              <button class="builder-opt ${builderSelections[si] === oi ? 'selected' : ''}" 
+              <button class="builder-opt ${builderSelections[si] === oi ? 'selected' : ''}"
                 data-step="${si}" data-opt="${oi}"
-                style="padding:12px 16px;border-radius:10px;border:2px solid ${builderSelections[si] === oi ? 'var(--teal)' : 'var(--border)'};background:${builderSelections[si] === oi ? 'rgba(94,234,212,.1)' : 'var(--card)'};color:var(--text);font-size:.9rem;font-weight:600;text-align:left;cursor:pointer;transition:all .2s">
+                style="padding:12px 16px;border-radius:10px;border:2px solid ${builderSelections[si] === oi ? 'var(--accent)' : 'var(--border)'};background:${builderSelections[si] === oi ? 'var(--accent-dim)' : 'var(--card)'};color:var(--text);font-size:.9rem;font-weight:600;text-align:left;cursor:pointer;transition:all var(--duration-base) var(--ease)">
                 ${opt}
               </button>
             `).join('')}
@@ -250,7 +250,7 @@ function renderQuiz(section) {
     <div id="quiz-options">
       ${q.options.map((opt, i) => `
         <button class="quiz-option" data-qi="${i}" id="qopt-${i}">
-          <span style="font-family:'Outfit',sans-serif;font-weight:700;color:var(--teal);margin-right:10px">${String.fromCharCode(65+i)}.</span>
+          <span style="font-family:var(--font-display);font-weight:600;color:var(--accent);margin-right:10px">${String.fromCharCode(65+i)}.</span>
           ${opt.replace(' ✓', '')}
         </button>
       `).join('')}
@@ -266,7 +266,7 @@ function renderQuizComplete(section) {
     <div class="lesson-card glass text-center" style="padding:40px 24px;margin-bottom:16px">
       <div style="font-size:3.5rem;margin-bottom:12px">${quizPerfect ? '🎯' : '💪'}</div>
       <div class="lesson-section-tag" style="justify-content:center">${section.emoji} Quiz Complete</div>
-      <div style="font-family:'Outfit',sans-serif;font-size:2rem;font-weight:900;margin:8px 0">${correct}/${total}</div>
+      <div style="font-family:var(--font-display);font-size:1.8rem;font-weight:800;margin:8px 0">${correct}/${total}</div>
       <div style="color:var(--muted);font-size:.9rem;margin-bottom:0">
         ${quizPerfect ? 'Perfect score! You crushed it 🏆' : 'Good effort! Keep going!'}
       </div>
@@ -279,7 +279,7 @@ function renderTieIn(section) {
   const c = section.content;
   const isComplete = c.action === 'complete_module';
   return `
-    <div class="lesson-card glass" style="margin-bottom:16px;border-color:rgba(168,175,189,.3)">
+    <div class="lesson-card glass" style="margin-bottom:16px;border-color:var(--border-bright)">
       <div class="lesson-section-tag" style="color:var(--gold)">${section.emoji} ${section.label}</div>
       <div class="lesson-title">${c.title}</div>
       <div class="lesson-body">${c.body.replace(/\n/g, '<br>')}</div>
@@ -341,7 +341,7 @@ function attachSectionEvents(section) {
         const textEl = document.getElementById(`swipe-text-${i}`);
         const cardEl = document.getElementById(`swipe-${i}`);
         if (textEl) {
-          textEl.style.color = 'var(--teal)';
+          textEl.style.color = 'var(--accent)';
           textEl.textContent = card.neutral;
         }
         if (cardEl) {
@@ -371,8 +371,8 @@ function attachSectionEvents(section) {
           b.style.borderColor = 'var(--border)';
           b.style.background = 'var(--card)';
         });
-        btn.style.borderColor = 'var(--teal)';
-        btn.style.background = 'rgba(94,234,212,.1)';
+        btn.style.borderColor = 'var(--accent)';
+        btn.style.background = 'var(--accent-dim)';
       });
     });
   }
@@ -490,16 +490,16 @@ function completeLessonFlow() {
   const app = document.getElementById('app');
   app.innerHTML = `
     <div class="screen">
-      <div class="celebration glass" style="margin-top:32px;border-color:rgba(94,234,212,.15)">
+      <div class="celebration glass" style="margin-top:32px;border-color:var(--border)">
         <span class="big-emoji">${quizPerfect ? '🎯' : '⭐'}</span>
-        <h2 style="font-family:var(--font-display);text-transform:uppercase;letter-spacing:.04em">Lesson Complete!</h2>
+        <h2 style="font-family:var(--font-display);font-weight:800;letter-spacing:-0.01em">Lesson Complete!</h2>
         <p style="color:var(--muted2);font-size:.875rem">${lessonData.title}</p>
-        <div class="xp-earned" style="animation:pulseLime 1.5s ease">+${lessonData.xp} XP EARNED</div>
+        <div class="xp-earned" style="animation:pulseLime 1.5s var(--ease)">+${lessonData.xp} XP EARNED</div>
         ${earned.length ? `
           <div style="margin:12px 0">
-            <div style="font-family:var(--font-display);font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">🏅 Badge${earned.length > 1 ? 's' : ''} Unlocked!</div>
+            <div style="font-family:var(--font-display);font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:10px">🏅 Badge${earned.length > 1 ? 's' : ''} Unlocked!</div>
             ${earned.map(b => `
-              <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(168,175,189,.1);border:1px solid rgba(168,175,189,.3);border-radius:6px;padding:8px 18px;margin:4px;font-family:var(--font-display);font-weight:700;font-size:.9rem;animation:badgeGlow .5s ease">
+              <div style="display:inline-flex;align-items:center;gap:8px;background:var(--gold-dim);border:1px solid var(--border-bright);border-radius:6px;padding:8px 18px;margin:4px;font-family:var(--font-display);font-weight:600;font-size:.9rem;animation:badgeGlow .5s var(--ease)">
                 ${b.icon} ${b.name}
               </div>
             `).join('')}
@@ -508,8 +508,8 @@ function completeLessonFlow() {
       </div>
 
       <!-- Take It To Practice tip -->
-      <div class="glass" style="padding:20px;margin-top:14px;border-left:3px solid var(--teal)">
-        <div style="font-family:var(--font-display);font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);margin-bottom:8px">⚡ Take It To Practice</div>
+      <div class="glass" style="padding:20px;margin-top:14px;border-left:3px solid var(--accent)">
+        <div style="font-family:var(--font-display);font-size:.7rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);margin-bottom:8px">⚡ Take It To Practice</div>
         <div style="font-size:.9rem;color:var(--muted2);line-height:1.6;font-family:var(--font-body)">${tip}</div>
       </div>
 

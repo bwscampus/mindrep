@@ -40,7 +40,7 @@ export function heroIllustration({ size = 220 } = {}) {
         </defs>
 
         <!-- orbit ring -->
-        <circle cx="100" cy="100" r="86" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1.5" stroke-dasharray="2 8" class="illo-spin"/>
+        <circle cx="100" cy="100" r="86" fill="none" stroke="rgba(20,32,46,0.10)" stroke-width="1.5" stroke-dasharray="2 8" class="illo-spin"/>
 
         <!-- orbiting reps -->
         <g class="illo-spin" style="transform-origin:100px 100px">
@@ -59,6 +59,30 @@ export function heroIllustration({ size = 220 } = {}) {
           <path d="M104 70l-16 22h12l-8 20 22-26h-13l7-16z" fill="var(--lime)" stroke="none"/>
         </g>
       </svg>
+    </div>
+  `;
+}
+
+// ============================================================
+// mindrep logo mark — concentric-ring mark, optionally paired with the
+// lowercase wordmark + tagline. This is the locked brand mark: three
+// concentric accent-blue rings/dot, used on onboarding and anywhere the
+// app needs a standalone brand identity (not just a module/nav icon).
+// ============================================================
+export function mindrepMark({ size = 40, withWordmark = false, withTagline = false } = {}) {
+  const ring = `
+    <svg width="${size}" height="${size}" viewBox="0 0 100 100" style="flex-shrink:0">
+      <circle cx="50" cy="50" r="44" fill="none" stroke="var(--accent)" stroke-width="9"/>
+      <circle cx="50" cy="50" r="26" fill="none" stroke="var(--accent-2)" stroke-width="9"/>
+      <circle cx="50" cy="50" r="9" fill="var(--accent-3)"/>
+    </svg>
+  `;
+  if (!withWordmark) return ring;
+  return `
+    <div style="display:inline-flex;flex-direction:column;align-items:center;gap:10px">
+      ${ring}
+      <div style="font-family:var(--font-display);font-weight:800;font-size:${Math.round(size * 0.7)}px;letter-spacing:-0.01em;color:var(--text)">mindrep</div>
+      ${withTagline ? `<div style="font-family:var(--font-body);font-weight:500;font-size:${Math.round(size * 0.28)}px;letter-spacing:0.04em;text-transform:uppercase;color:var(--muted)">Train Your Mind</div>` : ''}
     </div>
   `;
 }
@@ -130,7 +154,7 @@ export function coachAvatar({ size = 52 } = {}) {
         <defs>
           <linearGradient id="${gradId}" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stop-color="#ffffff"/>
-            <stop offset="100%" stop-color="#E2F9FF"/>
+            <stop offset="100%" stop-color="#E4EDFA"/>
           </linearGradient>
         </defs>
         <circle cx="16" cy="16" r="13" fill="none" stroke="url(#${gradId})" stroke-width="1.6" stroke-dasharray="3 3" opacity="0.6"/>
@@ -140,6 +164,20 @@ export function coachAvatar({ size = 52 } = {}) {
       </svg>
     </div>
   `;
+}
+
+// ============================================================
+// Lock / check state icons — replace the 🔒/✅ glyphs used as module and
+// lesson completion-state indicators (module cards, home journey list).
+// Kept separate from the broader emoji set, which stays as-is per the
+// redesign's scoped emoji-to-SVG conversion (chrome/state icons only).
+// ============================================================
+export function lockIcon(color = 'currentColor', size = 16) {
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V7.5a4 4 0 0 1 8 0V11"/></svg>`;
+}
+
+export function checkIcon(color = 'currentColor', size = 16) {
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="${color}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M4 12.5l5 5L20 6.5"/></svg>`;
 }
 
 // ============================================================
@@ -172,14 +210,14 @@ export function sportIcon(sportId, color = 'var(--text)', size = 22) {
 // where inline SVG / CSS custom properties aren't available, so this
 // draws the same motif with the Canvas 2D API instead).
 // ============================================================
-export function drawMindGlyph(ctx, cx, cy, r, { glowOpacity = 0.05, strokeOpacity = 0.5, boltColor = 'rgba(94,234,212,0.5)' } = {}) {
+export function drawMindGlyph(ctx, cx, cy, r, { glowOpacity = 0.05, strokeOpacity = 0.5, boltColor = 'rgba(62,111,196,0.5)' } = {}) {
   ctx.save();
 
   // soft radial glow
   const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, r);
-  grad.addColorStop(0, `rgba(94,234,212,${glowOpacity * 1.4})`);
-  grad.addColorStop(0.6, `rgba(168,175,189,${glowOpacity})`);
-  grad.addColorStop(1, 'rgba(168,175,189,0)');
+  grad.addColorStop(0, `rgba(62,111,196,${glowOpacity * 1.4})`);
+  grad.addColorStop(0.6, `rgba(100,116,139,${glowOpacity})`);
+  grad.addColorStop(1, 'rgba(100,116,139,0)');
   ctx.fillStyle = grad;
   ctx.beginPath();
   ctx.arc(cx, cy, r, 0, Math.PI * 2);

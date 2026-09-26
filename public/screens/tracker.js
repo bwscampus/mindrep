@@ -29,7 +29,7 @@ function buildTrackerHTML(progress, navigate) {
 
   return `
     <div class="screen" style="padding-top:24px">
-      <h1 style="font-family:var(--font-display);font-size:2rem;font-weight:900;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">Season Tracker</h1>
+      <h1 style="font-family:var(--font-display);font-size:1.7rem;font-weight:800;letter-spacing:-0.01em;margin-bottom:4px">Season Tracker</h1>
       <p style="color:var(--muted2);font-size:.85rem;margin-bottom:20px;font-family:var(--font-body)">Track your mental performance every ${sportTerms.event.toLowerCase()}.</p>
 
       <div class="tab-bar">
@@ -51,7 +51,7 @@ function buildTrackerHTML(progress, navigate) {
 function renderJournalTab(progress, sportTerms) {
   return `
     <div class="glass" style="padding:24px;margin-bottom:16px">
-      <div style="font-family:var(--font-display);font-size:1.1rem;font-weight:900;text-transform:uppercase;letter-spacing:.04em;margin-bottom:18px">📝 Log a ${sportTerms.event}</div>
+      <div style="font-family:var(--font-display);font-size:1.05rem;font-weight:700;letter-spacing:-0.005em;margin-bottom:18px">Log a ${sportTerms.event}</div>
       <div class="reflection-form">
 
         <!-- Type buttons -->
@@ -68,7 +68,7 @@ function renderJournalTab(progress, sportTerms) {
         <div>
           <div class="reflection-question">Date</div>
           <input type="date" id="game-date" value="${new Date().toISOString().split('T')[0]}"
-            style="width:100%;background:rgba(255,255,255,.04);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;color:var(--text);font-size:.9rem;transition:border-color .2s"
+            style="width:100%;background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;color:var(--text);font-size:.9rem;transition:border-color var(--duration-base) var(--ease)"
           />
         </div>
 
@@ -119,7 +119,7 @@ function renderJournalTab(progress, sportTerms) {
           <textarea class="reflection-textarea" id="q-next" placeholder="e.g. Remember to breathe before a ${sportTerms.miss}..." rows="2"></textarea>
         </div>
 
-        <button class="btn btn-primary btn-block btn-lg" id="save-entry" style="text-transform:uppercase;letter-spacing:.08em">Save Entry ✓</button>
+        <button class="btn btn-primary btn-block btn-lg" id="save-entry">Save Entry</button>
       </div>
     </div>
   `;
@@ -131,7 +131,7 @@ function renderHistoryTab(progress, sportTerms, navigate) {
     return `
       <div class="glass text-center" style="padding:48px 24px">
         <div style="font-size:3.5rem;margin-bottom:16px">📝</div>
-        <h3 style="font-family:var(--font-display);font-size:1.3rem;font-weight:900;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">No Entries Yet</h3>
+        <h3 style="font-family:var(--font-display);font-size:1.2rem;font-weight:800;letter-spacing:-0.01em;margin-bottom:8px">No Entries Yet</h3>
         <p style="color:var(--muted2);font-size:.88rem;margin-bottom:20px;font-family:var(--font-body);line-height:1.5">Log your next ${sportTerms.event.toLowerCase()} after it happens to start building your mental performance record.</p>
         <button class="btn btn-primary" id="go-log">Log a ${sportTerms.event} →</button>
       </div>
@@ -163,17 +163,17 @@ function renderHistoryTab(progress, sportTerms, navigate) {
         <div class="glass" style="padding:16px;margin-bottom:10px;border-left:3px solid ${entry.type === 'practice' ? 'var(--purple)' : 'var(--teal)'}">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
             <div>
-              <div style="font-family:var(--font-display);font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">${entry.type === 'practice' ? '🏋️ Practice' : `${sportTerms.emoji} ${sportTerms.event}`} · ${new Date(entry.date).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div>
-              <div style="font-family:var(--font-display);font-weight:700;font-size:.95rem;text-transform:uppercase;margin-top:2px">${entry.qGood ? entry.qGood.slice(0,38) + (entry.qGood.length > 38 ? '…' : '') : 'Session Entry'}</div>
+              <div style="font-family:var(--font-display);font-size:.68rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">${entry.type === 'practice' ? '🏋️ Practice' : `${sportTerms.emoji} ${sportTerms.event}`} · ${new Date(entry.date).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div>
+              <div style="font-family:var(--font-display);font-weight:600;font-size:.95rem;margin-top:2px">${entry.qGood ? entry.qGood.slice(0,38) + (entry.qGood.length > 38 ? '…' : '') : 'Session Entry'}</div>
             </div>
             <div style="text-align:right;flex-shrink:0">
-              <div style="font-family:var(--font-display);font-size:1.6rem;font-weight:900;color:var(--teal);line-height:1">${entry.performance}</div>
-              <div style="font-size:.65rem;color:var(--muted);font-family:var(--font-display);font-weight:700;letter-spacing:.08em;text-transform:uppercase">/10 Perf</div>
+              <div style="font-family:var(--font-display);font-size:1.5rem;font-weight:800;color:var(--accent);line-height:1">${entry.performance}</div>
+              <div style="font-size:.65rem;color:var(--muted);font-family:var(--font-display);font-weight:600;letter-spacing:.06em;text-transform:uppercase">/10 Perf</div>
             </div>
           </div>
           <div style="display:flex;gap:8px">
-            <div style="background:rgba(168,175,189,.15);border-radius:50px;padding:3px 10px;font-family:var(--font-display);font-size:.72rem;font-weight:700;color:var(--purple)">Conf ${entry.confidence}/5</div>
-            <div style="background:rgba(94,234,212,.1);border-radius:50px;padding:3px 10px;font-family:var(--font-display);font-size:.72rem;font-weight:700;color:var(--teal)">Focus ${'★'.repeat(Math.round(entry.mental||3))}${'☆'.repeat(5-Math.round(entry.mental||3))}</div>
+            <div style="background:var(--gold-dim);border-radius:50px;padding:3px 10px;font-family:var(--font-display);font-size:.72rem;font-weight:600;color:var(--purple)">Conf ${entry.confidence}/5</div>
+            <div style="background:var(--accent-dim);border-radius:50px;padding:3px 10px;font-family:var(--font-display);font-size:.72rem;font-weight:600;color:var(--accent)">Focus ${'★'.repeat(Math.round(entry.mental||3))}${'☆'.repeat(5-Math.round(entry.mental||3))}</div>
           </div>
           ${entry.qNext ? `<div style="margin-top:8px;font-size:.78rem;color:var(--muted);border-top:1px solid var(--border);padding-top:8px;font-family:var(--font-body)">Next: ${entry.qNext}</div>` : ''}
         </div>
@@ -189,7 +189,7 @@ function renderWeeklyTab(progress, navigate) {
   return `
     <div>
       ${due ? `
-        <div class="glass" style="padding:24px;text-align:center;margin-bottom:18px;border-color:rgba(94,234,212,.25);background:linear-gradient(135deg,rgba(94,234,212,.08),transparent)">
+        <div class="glass" style="padding:24px;text-align:center;margin-bottom:18px;border-color:var(--border);background:var(--accent-dim)">
           <div style="font-size:2.2rem;margin-bottom:8px">🗓️</div>
           <div style="font-family:var(--font-ui);font-weight:700;font-size:1.05rem;margin-bottom:6px">This week's check-in is open</div>
           <p style="color:var(--muted2);font-size:.85rem;margin-bottom:18px;line-height:1.5">A 1-minute pulse on effort, confidence, and consistency.</p>
@@ -204,7 +204,7 @@ function renderWeeklyTab(progress, navigate) {
       ${checkins.length === 0 ? `
         <div class="glass text-center" style="padding:40px 24px">
           <div style="font-size:3rem;margin-bottom:14px">📋</div>
-          <h3 style="font-family:var(--font-display);font-size:1.15rem;font-weight:900;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">No Check-Ins Yet</h3>
+          <h3 style="font-family:var(--font-display);font-size:1.1rem;font-weight:800;letter-spacing:-0.01em;margin-bottom:8px">No Check-Ins Yet</h3>
           <p style="color:var(--muted2);font-size:.85rem;font-family:var(--font-body);line-height:1.5">Your weekly reflections will build up here over time.</p>
         </div>
       ` : checkins.map(c => `
@@ -239,7 +239,7 @@ function renderTrendsTab(progress, sportTerms, navigate) {
       </div>
       <div class="glass text-center" style="padding:28px 24px;margin-top:-8px;position:relative;z-index:2">
         <div style="font-size:2.5rem;margin-bottom:10px">📈</div>
-        <div style="font-family:var(--font-display);font-size:1.1rem;font-weight:900;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">Log 3 Sessions to Unlock Trends</div>
+        <div style="font-family:var(--font-display);font-size:1.05rem;font-weight:700;letter-spacing:-0.005em;margin-bottom:8px">Log 3 Sessions to Unlock Trends</div>
         <p style="color:var(--muted2);font-size:.875rem;margin-bottom:20px;font-family:var(--font-body);line-height:1.5">Track at least 3 ${sportTerms.event.toLowerCase()}s to see your mental performance trends over time.</p>
         <button class="btn btn-primary" id="trends-go-log">Log a ${sportTerms.event} →</button>
       </div>
@@ -263,23 +263,23 @@ function renderTrendsTab(progress, sportTerms, navigate) {
       <!-- Summary stats -->
       <div class="glass" style="padding:18px 20px;margin-bottom:16px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center">
         <div>
-          <div style="font-family:var(--font-display);font-size:1.8rem;font-weight:900;color:var(--teal)">${avgFocus}</div>
-          <div style="font-family:var(--font-display);font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">Avg Focus</div>
+          <div style="font-family:var(--font-display);font-size:1.6rem;font-weight:800;color:var(--accent)">${avgFocus}</div>
+          <div style="font-family:var(--font-display);font-size:.6rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Avg Focus</div>
         </div>
         <div>
-          <div style="font-family:var(--font-display);font-size:1.8rem;font-weight:900;color:var(--purple)">${avgConf}</div>
-          <div style="font-family:var(--font-display);font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">Avg Conf</div>
+          <div style="font-family:var(--font-display);font-size:1.6rem;font-weight:800;color:var(--purple)">${avgConf}</div>
+          <div style="font-family:var(--font-display);font-size:.6rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Avg Conf</div>
         </div>
         <div>
-          <div style="font-family:var(--font-display);font-size:1.8rem;font-weight:900;color:var(--gold)">${avgPerf}</div>
-          <div style="font-family:var(--font-display);font-size:.6rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">Avg Perf</div>
+          <div style="font-family:var(--font-display);font-size:1.6rem;font-weight:800;color:var(--gold)">${avgPerf}</div>
+          <div style="font-family:var(--font-display);font-size:.6rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Avg Perf</div>
         </div>
       </div>
 
       <!-- Trend insight -->
-      <div class="glass" style="padding:14px 18px;margin-bottom:16px;border-left:3px solid var(--teal);display:flex;align-items:center;justify-content:space-between">
-        <div style="font-family:var(--font-display);font-weight:700;font-size:.9rem">${trendLabel}</div>
-        ${best ? `<div style="font-family:var(--font-display);font-size:.8rem;font-weight:700;color:var(--gold)">Best: ${best}/10</div>` : ''}
+      <div class="glass" style="padding:14px 18px;margin-bottom:16px;border-left:3px solid var(--accent);display:flex;align-items:center;justify-content:space-between">
+        <div style="font-family:var(--font-display);font-weight:600;font-size:.9rem">${trendLabel}</div>
+        ${best ? `<div style="font-family:var(--font-display);font-size:.8rem;font-weight:600;color:var(--gold)">Best: ${best}/10</div>` : ''}
       </div>
 
       ${renderSVGLineChart('Mental Focus Over Time', last8.map(e => e.mental||3), 5, 'var(--teal)', last8.map(e => new Date(e.date).toLocaleDateString('en-US',{month:'short',day:'numeric'})))}
@@ -297,43 +297,42 @@ function renderSVGLineChart(title, data, maxVal, color, labels = []) {
   const yScale = (H - pad * 2) / maxVal;
   const points = data.map((v, i) => `${pad + i * xStep},${H - pad - v * yScale}`).join(' ');
 
+  const gradId = `fill-${title.replace(/\s/g,'')}-${Math.random().toString(36).slice(2, 8)}`;
   return `
     <div class="glass chart-wrap" style="margin-bottom:14px;padding:18px">
-      <div style="font-family:var(--font-display);font-weight:900;font-size:.85rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px">${title}</div>
+      <div style="font-family:var(--font-display);font-weight:700;font-size:.85rem;letter-spacing:0;margin-bottom:14px">${title}</div>
       <svg viewBox="0 0 ${W} ${H + 24}" width="100%" style="overflow:visible">
         <!-- Grid lines -->
         ${[1,2,3,4,5].slice(0, maxVal).map(v => `
           <line x1="${pad}" y1="${H - pad - v * yScale}" x2="${W - pad}" y2="${H - pad - v * yScale}"
-            stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+            stroke="rgba(20,32,46,0.06)" stroke-width="1"/>
         `).join('')}
         <!-- Fill area -->
         <defs>
-          <linearGradient id="fill-${title.replace(/\s/g,'')}" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stop-color="${color}" stop-opacity="0.2"/>
+          <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="${color}" stop-opacity="0.16"/>
             <stop offset="100%" stop-color="${color}" stop-opacity="0.0"/>
           </linearGradient>
         </defs>
         <polygon points="${points} ${pad + (n-1)*xStep},${H - pad} ${pad},${H - pad}"
-          fill="url(#fill-${title.replace(/\s/g,'')})" />
+          fill="url(#${gradId})" />
         <!-- Line -->
-        <polyline points="${points}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
-          style="filter:drop-shadow(0 0 4px ${color})"/>
+        <polyline points="${points}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
         <!-- Dots -->
         ${data.map((v, i) => `
           <circle cx="${pad + i * xStep}" cy="${H - pad - v * yScale}" r="4"
-            fill="${color}" stroke="#14171D" stroke-width="2"
-            style="filter:drop-shadow(0 0 4px ${color})"/>
+            fill="${color}" stroke="#ffffff" stroke-width="2"/>
         `).join('')}
         <!-- X labels -->
         ${labels.length > 0 ? labels.map((l, i) => `
           <text x="${pad + i * xStep}" y="${H + 18}" text-anchor="middle"
-            font-family="Barlow Condensed, sans-serif" font-size="9" font-weight="600"
-            fill="#64748B" letter-spacing="0.5">
+            font-family="Poppins, sans-serif" font-size="9" font-weight="500"
+            fill="#6B7684" letter-spacing="0.3">
             ${l.split(' ').join('\n')}
           </text>
         `).join('') : data.map((_, i) => `
           <text x="${pad + i * xStep}" y="${H + 18}" text-anchor="middle"
-            font-family="Barlow Condensed, sans-serif" font-size="9" font-weight="600" fill="#64748B">
+            font-family="Poppins, sans-serif" font-size="9" font-weight="500" fill="#6B7684">
             ${i + 1}
           </text>
         `).join('')}
@@ -348,15 +347,16 @@ function renderSVGBarChart(title, data, maxVal, color, labels = []) {
   const barW = Math.max(8, (W - pad * 2) / n - 6);
   const yScale = (H - pad * 2) / maxVal;
   const gap = (W - pad * 2) / n;
+  const gradId = `bar-fill-${title.replace(/\s/g,'')}-${Math.random().toString(36).slice(2, 8)}`;
 
   return `
     <div class="glass chart-wrap" style="margin-bottom:14px;padding:18px">
-      <div style="font-family:var(--font-display);font-weight:900;font-size:.85rem;text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px">${title}</div>
+      <div style="font-family:var(--font-display);font-weight:700;font-size:.85rem;letter-spacing:0;margin-bottom:14px">${title}</div>
       <svg viewBox="0 0 ${W} ${H + 24}" width="100%" style="overflow:visible">
         <defs>
-          <linearGradient id="bar-fill" x1="0" y1="0" x2="0" y2="1">
+          <linearGradient id="${gradId}" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stop-color="${color}" stop-opacity="1"/>
-            <stop offset="100%" stop-color="${color}" stop-opacity="0.25"/>
+            <stop offset="100%" stop-color="${color}" stop-opacity="0.35"/>
           </linearGradient>
         </defs>
         ${data.map((v, i) => {
@@ -365,15 +365,15 @@ function renderSVGBarChart(title, data, maxVal, color, labels = []) {
           const by = H - pad - bh;
           return `
             <rect x="${bx}" y="${by}" width="${barW}" height="${bh}" rx="3"
-              fill="url(#bar-fill)" style="filter:drop-shadow(0 0 4px ${color}44)"/>
+              fill="url(#${gradId})"/>
             ${labels[i] ? `
               <text x="${bx + barW/2}" y="${H + 18}" text-anchor="middle"
-                font-family="Barlow Condensed, sans-serif" font-size="9" font-weight="600" fill="#64748B">
+                font-family="Poppins, sans-serif" font-size="9" font-weight="500" fill="#6B7684">
                 ${labels[i]}
               </text>
             ` : `
               <text x="${bx + barW/2}" y="${H + 18}" text-anchor="middle"
-                font-family="Barlow Condensed, sans-serif" font-size="9" font-weight="600" fill="#64748B">
+                font-family="Poppins, sans-serif" font-size="9" font-weight="500" fill="#6B7684">
                 ${i + 1}
               </text>
             `}
@@ -417,8 +417,8 @@ export function attachTrackerEvents(navigate) {
     btn.addEventListener('click', () => {
       entryType = btn.dataset.type;
       document.querySelectorAll('.entry-type-btn').forEach(b => {
-        b.style.borderColor = b === btn ? 'var(--teal)' : '';
-        b.style.color       = b === btn ? 'var(--teal)' : '';
+        b.style.borderColor = b === btn ? 'var(--accent)' : '';
+        b.style.color       = b === btn ? 'var(--accent)' : '';
       });
     });
   });
@@ -429,9 +429,9 @@ export function attachTrackerEvents(navigate) {
     btn.addEventListener('click', () => {
       mentalVal = parseInt(btn.dataset.val);
       document.querySelectorAll('.mental-btn').forEach(b => {
-        b.style.borderColor = b === btn ? 'var(--teal)' : 'var(--border)';
-        b.style.background  = b === btn ? 'rgba(94,234,212,.1)' : 'none';
-        b.style.transform   = b === btn ? 'scale(1.18)' : 'scale(1)';
+        b.style.borderColor = b === btn ? 'var(--accent)' : 'var(--border)';
+        b.style.background  = b === btn ? 'var(--accent-dim)' : 'none';
+        b.style.transform   = b === btn ? 'scale(1.1)' : 'scale(1)';
       });
     });
   });
@@ -494,31 +494,19 @@ export function attachTrackerEvents(navigate) {
 function showReminderPrompt(entry, user, navigate) {
   // Show a modal banner
   const overlay = document.createElement('div');
-  overlay.style.cssText = `
-    position:fixed;inset:0;z-index:9000;
-    background:rgba(0,0,0,0.6);
-    display:flex;align-items:flex-end;
-    backdrop-filter:blur(4px);
-    animation:fadeIn .2s ease;
-  `;
+  overlay.className = 'modal-scrim';
   const gameDate = new Date(entry.date);
   const dateStr  = gameDate.toLocaleDateString('en-US', { weekday:'long', month:'short', day:'numeric' });
 
   overlay.innerHTML = `
-    <div style="
-      background:var(--bg2);
-      border:1px solid var(--border-bright);
-      border-top-left-radius:16px;border-top-right-radius:16px;
-      padding:28px 24px;width:100%;max-width:430px;margin:0 auto;
-      animation:fadeUp .3s ease;
-    ">
-      <div style="font-size:2rem;margin-bottom:10px">🔔</div>
-      <div style="font-family:var(--font-display);font-size:1.1rem;font-weight:900;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">Want a mental warm-up reminder?</div>
+    <div class="modal-sheet">
+      <div style="font-size:1.8rem;margin-bottom:10px">🔔</div>
+      <div style="font-family:var(--font-display);font-size:1.1rem;font-weight:700;letter-spacing:-0.01em;margin-bottom:6px">Want a mental warm-up reminder?</div>
       <p style="color:var(--muted2);font-size:.875rem;margin-bottom:20px;font-family:var(--font-body);line-height:1.5">
         We'll remind you to open MindRep 1 hour before your ${entry.type === 'game' ? 'game' : 'session'} on ${dateStr}.
       </p>
       <div style="display:flex;gap:10px">
-        <button id="reminder-yes" class="btn btn-primary" style="flex:1;font-size:.85rem">Yes, remind me ✓</button>
+        <button id="reminder-yes" class="btn btn-primary" style="flex:1;font-size:.85rem">Yes, remind me</button>
         <button id="reminder-no"  class="btn btn-secondary" style="flex:.5;font-size:.85rem">No thanks</button>
       </div>
     </div>

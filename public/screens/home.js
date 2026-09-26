@@ -2,7 +2,7 @@
 
 import { MODULES, SPORTS } from '../data/lessons.js';
 import { getProgress, getUser } from '../utils/storage.js';
-import { moduleIcon } from '../utils/illustrations.js';
+import { moduleIcon, lockIcon, checkIcon } from '../utils/illustrations.js';
 import { isLockedIn } from '../utils/lockedIn.js';
 import { getTodayRep } from '../data/dailyReps.js';
 import { isWeeklyCheckinDue } from '../utils/weekly.js';
@@ -121,8 +121,8 @@ export function renderHome(navigate) {
                   <div class="module-title" style="text-transform:none;letter-spacing:0;font-family:var(--font-ui);font-size:1.05rem">${mod.title}</div>
                 </div>
               </div>
-              ${isComplete ? `<div style="font-size:1.2rem;flex-shrink:0">✅</div>` :
-                isLocked   ? `<div class="lock-icon">🔒</div>` :
+              ${isComplete ? `<div style="color:var(--accent);flex-shrink:0">${checkIcon('currentColor', 20)}</div>` :
+                isLocked   ? `<div class="lock-icon">${lockIcon('currentColor', 16)}</div>` :
                 `<div class="tile-pill ${modCompleted === 0 ? '' : 'accent'}">${modCompleted === 0 ? 'Start' : 'In Progress'}</div>`}
             </div>
             <div style="font-size:.83rem;color:var(--muted2);margin-bottom:10px;font-family:var(--font-body)">${mod.description}</div>

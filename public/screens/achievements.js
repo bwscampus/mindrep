@@ -5,7 +5,7 @@ import { storage, getProgress, saveProgress, getUser, getXPForLevel, LEVEL_NAMES
 import { signOut } from '../utils/session.js';
 import { isAdmin, activateAdmin, deactivateAdmin, applyAdminUnlock } from '../utils/admin.js';
 import { showToast, fireConfetti } from '../utils/gamification.js';
-import { drawMindGlyph } from '../utils/illustrations.js';
+import { drawMindGlyph, lockIcon, checkIcon } from '../utils/illustrations.js';
 import { isLockedIn } from '../utils/lockedIn.js';
 
 export function renderAchievements(navigate) {
@@ -43,8 +43,8 @@ export function renderAchievements(navigate) {
               stroke="url(#grad1)"/>
             <defs>
               <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" style="stop-color:#8FF5D0"/>
-                <stop offset="100%" style="stop-color:#5EEAD4"/>
+                <stop offset="0%" style="stop-color:#6E97D6"/>
+                <stop offset="100%" style="stop-color:#3E6FC4"/>
               </linearGradient>
             </defs>
           </svg>
@@ -53,8 +53,8 @@ export function renderAchievements(navigate) {
             <span class="lv-label">Level</span>
           </div>
         </div>
-        <h1 style="font-family:var(--font-display);font-size:1.8rem;font-weight:900;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">${user?.name || 'Athlete'}</h1>
-        <div style="color:var(--gold);font-family:var(--font-display);font-weight:700;font-size:1rem;letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px">${levelInfo.label}</div>
+        <h1 style="font-family:var(--font-display);font-size:1.6rem;font-weight:800;letter-spacing:-0.01em;margin-bottom:4px">${user?.name || 'Athlete'}</h1>
+        <div style="color:var(--gold);font-family:var(--font-display);font-weight:600;font-size:.95rem;letter-spacing:.04em;text-transform:uppercase;margin-bottom:12px">${levelInfo.label}</div>
         <div style="font-size:.8rem;color:var(--muted);margin-bottom:8px;font-family:var(--font-body)">${xp} / ${levelInfo.next} XP to Level ${level + 1}</div>
         <div class="xp-bar-wrap">
           <div class="xp-bar" style="width:${xpPct}%"></div>
@@ -113,7 +113,7 @@ export function renderAchievements(navigate) {
       </div>
 
       <!-- Share button -->
-      <button class="btn btn-secondary btn-block mb-16" id="share-progress-btn" style="border-color:rgba(94,234,212,.3);color:var(--teal)">
+      <button class="btn btn-secondary btn-block mb-16" id="share-progress-btn" style="border-color:rgba(62,111,196,.3);color:var(--accent)">
         📤 Share My Progress
       </button>
 
@@ -123,13 +123,13 @@ export function renderAchievements(navigate) {
       <div class="section-heading">🏅 Achievements</div>
       ${earnedBadges.length === 0 ? `
         <div class="glass" style="padding:24px;text-align:center;margin-bottom:16px">
-          <div style="font-family:var(--font-display);font-size:.75rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:16px">Locked Badges — Complete Lessons to Earn</div>
+          <div style="font-family:var(--font-display);font-size:.75rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:16px">Locked Badges — Complete Lessons to Earn</div>
           <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px">
             ${BADGES.slice(0, 9).map(badge => `
               <div class="badge-card glass locked-badge" style="padding:14px 8px;border-radius:8px">
                 <span class="be" style="filter:grayscale(1) opacity(.25)">${badge.icon}</span>
                 <div class="bn">${badge.name}</div>
-                <div class="bd">🔒 Locked</div>
+                <div class="bd" style="display:flex;align-items:center;justify-content:center;gap:3px">${lockIcon('currentColor', 10)} Locked</div>
               </div>
             `).join('')}
           </div>
@@ -143,7 +143,7 @@ export function renderAchievements(navigate) {
               <div class="badge-card glass ${isEarned ? 'earned' : 'locked-badge'}">
                 <span class="be">${badge.icon}</span>
                 <div class="bn">${badge.name}</div>
-                <div class="bd">${isEarned ? badge.desc : '🔒 Locked'}</div>
+                <div class="bd" style="${isEarned ? '' : 'display:flex;align-items:center;justify-content:center;gap:3px'}">${isEarned ? badge.desc : lockIcon('currentColor', 10) + ' Locked'}</div>
               </div>
             `;
           }).join('')}
@@ -162,16 +162,17 @@ export function renderAchievements(navigate) {
           return `
             <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);opacity:${isReached ? '1' : '.4'}">
               <div style="width:32px;height:32px;border-radius:50%;
-                background:${isCurrent ? 'linear-gradient(135deg,var(--teal),var(--purple))' : isReached ? 'rgba(94,234,212,.2)' : 'var(--card)'};
-                border:2px solid ${isCurrent ? 'var(--teal)' : isReached ? 'var(--teal)' : 'var(--border)'};
-                display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:900;font-size:.85rem;flex-shrink:0">
-                ${isReached ? (isCurrent ? lv : '✓') : lv}
+                background:${isCurrent ? 'var(--accent)' : isReached ? 'var(--accent-dim)' : 'var(--card)'};
+                border:2px solid ${isCurrent ? 'var(--accent)' : isReached ? 'var(--accent)' : 'var(--border)'};
+                color:${isCurrent ? '#fff' : 'var(--text)'};
+                display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:700;font-size:.85rem;flex-shrink:0">
+                ${isReached ? (isCurrent ? lv : checkIcon('currentColor', 14)) : lv}
               </div>
               <div style="flex:1">
-                <div style="font-family:var(--font-display);font-weight:700;font-size:.95rem;text-transform:uppercase;letter-spacing:.04em">${name}</div>
+                <div style="font-family:var(--font-display);font-weight:600;font-size:.95rem;letter-spacing:0">${name}</div>
                 <div style="font-size:.7rem;color:var(--muted);font-family:var(--font-body)">${xpNeeded} XP</div>
               </div>
-              ${isCurrent ? `<div style="font-family:var(--font-display);font-size:.68rem;font-weight:700;color:var(--teal);letter-spacing:.1em;text-transform:uppercase">You Are Here</div>` : ''}
+              ${isCurrent ? `<div style="font-family:var(--font-display);font-size:.68rem;font-weight:600;color:var(--accent);letter-spacing:.08em;text-transform:uppercase">You Are Here</div>` : ''}
             </div>
           `;
         }).join('')}
@@ -180,13 +181,13 @@ export function renderAchievements(navigate) {
       <!-- Notification preference toggle -->
       <div class="glass" style="padding:18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">
         <div>
-          <div style="font-family:var(--font-display);font-weight:700;font-size:.9rem;text-transform:uppercase;letter-spacing:.06em">Pre-Game Reminders</div>
+          <div style="font-family:var(--font-display);font-weight:600;font-size:.9rem;letter-spacing:0">Pre-Game Reminders</div>
           <div style="font-size:.75rem;color:var(--muted2);margin-top:2px;font-family:var(--font-body)">In-app banner when a game is coming up</div>
         </div>
-        <label style="position:relative;width:46px;height:26px;flex-shrink:0">
-          <input type="checkbox" id="reminder-toggle" style="opacity:0;width:0;height:0" ${localStorage.getItem('mindrep_reminders') === 'true' ? 'checked' : ''}>
-          <span id="reminder-track" style="position:absolute;inset:0;border-radius:50px;cursor:pointer;transition:background .2s;background:${localStorage.getItem('mindrep_reminders') === 'true' ? 'var(--teal)' : 'rgba(255,255,255,0.12)'}"></span>
-          <span id="reminder-thumb" style="position:absolute;top:3px;left:${localStorage.getItem('mindrep_reminders') === 'true' ? '22px' : '3px'};width:20px;height:20px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.4)"></span>
+        <label class="toggle">
+          <input type="checkbox" id="reminder-toggle" ${localStorage.getItem('mindrep_reminders') === 'true' ? 'checked' : ''}>
+          <span class="toggle-track"></span>
+          <span class="toggle-thumb"></span>
         </label>
       </div>
 
@@ -194,12 +195,12 @@ export function renderAchievements(navigate) {
       <div id="admin-trigger" style="text-align:center;cursor:pointer;padding:16px 0;opacity:.12;font-size:.7rem;letter-spacing:.05em">⚙</div>
 
       <div id="admin-panel" style="display:none">
-        <div class="glass" style="padding:24px;margin-bottom:16px;border-color:${admin ? 'rgba(94,234,212,.4)' : 'rgba(255,255,255,.1)'}">
-          <div style="font-family:var(--font-display);font-weight:900;font-size:1rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">${admin ? '⚡ Demo Mode — Active' : '🔒 Demo Mode'}</div>
+        <div class="glass" style="padding:24px;margin-bottom:16px;border-color:${admin ? 'rgba(62,111,196,.35)' : 'var(--border)'}">
+          <div style="font-family:var(--font-display);font-weight:700;font-size:1rem;letter-spacing:0;margin-bottom:4px">${admin ? '⚡ Demo Mode — Active' : 'Demo Mode'}</div>
           <div style="font-size:.8rem;color:var(--muted);margin-bottom:16px;font-family:var(--font-body)">${admin ? 'Full access to all features and content, for testing/demo purposes.' : 'Enter the demo passphrase to preview all content. This is a testing shortcut, not real account security.'}</div>
           ${admin ? `
             <div style="display:flex;flex-direction:column;gap:10px">
-              <div style="font-size:.85rem;color:var(--muted);background:rgba(94,234,212,.07);border:1px solid rgba(94,234,212,.2);border-radius:8px;padding:12px 14px;font-family:var(--font-body)">
+              <div style="font-size:.85rem;color:var(--muted);background:var(--accent-dim);border:1px solid rgba(62,111,196,.2);border-radius:8px;padding:12px 14px;font-family:var(--font-body)">
                 ✅ All 7 modules unlocked<br>
                 ✅ All badges awarded<br>
                 ✅ Premium AI Coach active<br>
@@ -210,7 +211,7 @@ export function renderAchievements(navigate) {
           ` : `
             <div style="display:flex;gap:8px">
               <input type="password" id="admin-pass" placeholder="Enter passphrase..."
-                style="flex:1;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:12px 14px;color:var(--text);font-size:.9rem;transition:border-color .2s"/>
+                style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 14px;color:var(--text);font-size:.9rem;transition:border-color var(--duration-base) var(--ease)"/>
               <button class="btn btn-primary btn-sm" id="admin-submit" style="flex-shrink:0">Unlock</button>
             </div>
             <div id="admin-error" style="color:var(--coral);font-size:.8rem;margin-top:8px;display:none;font-family:var(--font-body)">Incorrect passphrase. Try again.</div>
@@ -278,10 +279,6 @@ export function attachAchievementsEvents(navigate) {
   document.getElementById('reminder-toggle')?.addEventListener('change', (e) => {
     const on = e.target.checked;
     localStorage.setItem('mindrep_reminders', on ? 'true' : 'false');
-    const track = document.getElementById('reminder-track');
-    const thumb = document.getElementById('reminder-thumb');
-    if (track) track.style.background = on ? 'var(--teal)' : 'rgba(255,255,255,0.12)';
-    if (thumb) thumb.style.left = on ? '22px' : '3px';
     showToast(on ? 'Reminders enabled ✓' : 'Reminders off', on ? '🔔' : '🔕', 2000);
     if (on) Notification.requestPermission?.();
   });
@@ -362,67 +359,68 @@ function generateShareCard(navigate) {
   const streak   = progress.streak || 0;
   const topBadge = BADGES.find(b => earnedBadges.includes(b.id));
 
-  // Background
-  ctx.fillStyle = '#14171D';
+  // Background — a deliberately darker "flex card" for sharing, distinct
+  // from the app's light UI (kept for visual punch on social media).
+  ctx.fillStyle = '#14202E';
   ctx.fillRect(0, 0, W, H);
 
   // Gradient overlay
   const grad = ctx.createLinearGradient(0, 0, W, H);
-  grad.addColorStop(0, 'rgba(94,234,212,0.08)');
-  grad.addColorStop(1, 'rgba(168,175,189,0.06)');
+  grad.addColorStop(0, 'rgba(62,111,196,0.10)');
+  grad.addColorStop(1, 'rgba(100,116,139,0.06)');
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, W, H);
 
-  // Left mint/teal stripe
-  ctx.fillStyle = '#5EEAD4';
+  // Left accent stripe
+  ctx.fillStyle = '#3E6FC4';
   ctx.fillRect(0, 0, 4, H);
 
   // MindRep logo text (top-left)
-  ctx.font = 'bold 900 28px "Barlow Condensed", sans-serif';
-  ctx.fillStyle = '#5EEAD4';
+  ctx.font = 'bold 800 28px "Poppins", sans-serif';
+  ctx.fillStyle = '#6E97D6';
   ctx.textBaseline = 'top';
-  ctx.fillText('MINDREP', 24, 22);
+  ctx.fillText('mindrep', 24, 22);
 
   // Illustrated mind/lightning flourish (replaces the old plain "M" watermark)
-  drawMindGlyph(ctx, W - 90, H / 2, 170, { glowOpacity: 0.05, strokeOpacity: 0.05, boltColor: 'rgba(94,234,212,0.06)' });
+  drawMindGlyph(ctx, W - 90, H / 2, 170, { glowOpacity: 0.05, strokeOpacity: 0.05, boltColor: 'rgba(62,111,196,0.06)' });
 
   // User name
-  ctx.font = '900 48px "Barlow Condensed", sans-serif';
+  ctx.font = '800 48px "Poppins", sans-serif';
   ctx.fillStyle = '#F1F5F9';
   ctx.textBaseline = 'top';
   ctx.fillText((user?.name || 'ATHLETE').toUpperCase(), 24, 72);
 
   // Level label
-  ctx.font = '700 20px "Barlow Condensed", sans-serif';
-  ctx.fillStyle = '#A8AFBD';
+  ctx.font = '600 20px "Poppins", sans-serif';
+  ctx.fillStyle = '#9DB7E0';
   ctx.fillText(`${levelInfo.label.toUpperCase()} · LEVEL ${level}`, 24, 130);
 
   // Streak
-  ctx.font = '900 72px "Barlow Condensed", sans-serif';
-  ctx.fillStyle = '#5EEAD4';
+  ctx.font = '800 72px "Poppins", sans-serif';
+  ctx.fillStyle = '#6E97D6';
   ctx.fillText(`🔥 ${streak}`, 24, 170);
 
-  ctx.font = '700 18px "Barlow Condensed", sans-serif';
-  ctx.fillStyle = '#64748B';
+  ctx.font = '600 18px "Poppins", sans-serif';
+  ctx.fillStyle = '#8791A0';
   ctx.fillText('DAY STREAK', 24, 255);
 
   // Top badge
   if (topBadge) {
     ctx.font = '60px serif';
     ctx.fillText(topBadge.icon, 340, 165);
-    ctx.font = '700 20px "Barlow Condensed", sans-serif';
+    ctx.font = '600 20px "Poppins", sans-serif';
     ctx.fillStyle = '#F1F5F9';
     ctx.fillText(topBadge.name.toUpperCase(), 340, 238);
-    ctx.font = '400 14px "Barlow Condensed", sans-serif';
-    ctx.fillStyle = '#64748B';
+    ctx.font = '400 14px "Poppins", sans-serif';
+    ctx.fillStyle = '#8791A0';
     ctx.fillText(topBadge.desc, 340, 262);
   }
 
   // Bottom bar
-  ctx.fillStyle = 'rgba(94,234,212,0.12)';
+  ctx.fillStyle = 'rgba(62,111,196,0.14)';
   ctx.fillRect(0, H - 52, W, 52);
-  ctx.fillStyle = '#5EEAD4';
-  ctx.font = '700 16px "Barlow Condensed", sans-serif';
+  ctx.fillStyle = '#6E97D6';
+  ctx.font = '600 16px "Poppins", sans-serif';
   ctx.textBaseline = 'middle';
   ctx.fillText('Building my mental game with MindRep', 24, H - 26);
 
