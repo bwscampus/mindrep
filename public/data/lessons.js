@@ -308,7 +308,7 @@ export const MODULES = [
             emoji: "⚡",
             content: {
               title: "The athlete who had every reason to quit.",
-              body: `Kyle Long was cut from four college football rosters. Division I coaches told him he was too slow. Too soft. Not built for the next level.\n\nHe didn't argue. He didn't blame anyone.\n\nHe just showed up — every single day — and did the work.\n\nThree years later, he was a <strong>first-round NFL draft pick</strong>.\n\nThe difference wasn't talent. It was a mindset Moawad calls <strong>"It Takes What It Takes."</strong>`,
+              body: `Kyle Long had a scholarship to pitch at Florida State. He lost it — poor grades, bad choices off the field.\n\nHe could have blamed the school. The coaches. Bad luck. He didn't.\n\nHe owned it. He went to a community college, switched to football, and rebuilt — one practice at a time. Then Oregon.\n\nIn 2013, he was a first-round NFL draft pick.\n\nThe difference wasn't talent. It was a mindset Moawad calls <strong>"It Takes What It Takes."</strong>`,
               question: "Have you ever used an excuse — weather, teammates, coaches — to explain a bad performance?"
             }
           },
@@ -350,10 +350,10 @@ export const MODULES = [
                   explanation: "When you give excuses power over your performance, you hand control of your results to things outside yourself."
                 },
                 {
-                  q: "Kyle Long was cut from how many college football rosters before being drafted?",
-                  options: ["One", "Two", "Three", "Four ✓"],
-                  correct: 3,
-                  explanation: "Four rejections. He didn't quit. He showed up. That's what 'It Takes What It Takes' looks like."
+                  q: "What did Kyle Long do after losing his spot at Florida State?",
+                  options: ["Blamed his coaches", "Quit sports for good", "Owned it and rebuilt at a community college ✓", "Went straight to the NFL"],
+                  correct: 2,
+                  explanation: "He didn't outsource the result. He owned it, did the work, and earned his way back. That's 'It Takes What It Takes.'"
                 },
                 {
                   q: "When conditions are unfair, a mentally strong athlete:",
@@ -399,7 +399,7 @@ export const MODULES = [
             emoji: "📖",
             content: {
               title: "Effort is a Superpower",
-              body: `Here's the truth about talent that no one tells you:\n\n<strong>Talent is common. Maximum effort is rare.</strong>\n\nIn Moawad's work with elite teams, the athletes who stuck around longest weren't always the most gifted. They were the ones who:\n\n✅ Stayed an extra 15 minutes after every practice\n✅ Showed up when they didn't feel like it\n✅ Competed in practice the same way they competed in games\n\nNFL data backs this up: players who showed elite effort metrics in practice outperformed equally talented players in games by a measurable margin.\n\n<strong>Effort is the one performance variable you control 100% of the time.</strong>`,
+              body: `Here's the truth about talent that no one tells you:\n\n<strong>Talent is common. Maximum effort is rare.</strong>\n\nIn Moawad's work with elite teams, the athletes who stuck around longest weren't always the most gifted. They were the ones who:\n\n✅ Stayed an extra 15 minutes after every practice\n✅ Showed up when they didn't feel like it\n✅ Competed in practice the same way they competed in games\n\n<strong>Effort is the one performance variable you control 100% of the time.</strong>`,
               highlight: '"Hard work beats talent when talent doesn\'t work hard." — Tim Notke (popularized by Kevin Durant)'
             }
           },
@@ -470,7 +470,7 @@ export const MODULES = [
             emoji: "⚡",
             content: {
               title: "The backup who won the Super Bowl.",
-              body: `In 2014, Malcolm Butler was an undrafted rookie cornerback. He barely made the team.\n\nIn Super Bowl XLIX, with the game on the line, he was the one on the field.\n\nHe intercepted a pass that won the championship.\n\nButler wasn't the starter. He wasn't the star. But he <strong>owned his role so completely</strong> that when his moment came, he was ready.\n\nMoad's lesson: <strong>the athlete who masters their role — no matter how small — earns bigger roles.</strong>`,
+              body: `In 2014, Malcolm Butler was an undrafted rookie cornerback. He barely made the team.\n\nIn Super Bowl XLIX, with the game on the line, he was the one on the field.\n\nHe intercepted a pass that won the championship.\n\nButler wasn't the starter. He wasn't the star. But he <strong>owned his role so completely</strong> that when his moment came, he was ready.\n\nMoawad's lesson: <strong>the athlete who masters their role — no matter how small — earns bigger roles.</strong>`,
               question: "Do you sometimes feel like your role on your team is too small? What does that feel like?"
             }
           },
@@ -480,7 +480,7 @@ export const MODULES = [
             emoji: "📖",
             content: {
               title: "Master the Role You Have",
-              body: `Every team has a star. But teams win because of the athletes who <strong>own the roles no one else wants.</strong>\n\nYour role might be:\n• Coming off the bench with energy\n• Being the defensive stopper\n• Setting the screen so someone else scores\n\nTake Steve Kerr — a player who averaged just 7 points per game — but shot the biggest shots of his career when it mattered. Why? Because Steve knew his role, prepared for it completely, and executed it without ego.\n\n<strong>Ego fights the role. Excellence masters it.</strong>`,
+              body: `Every team has a star. But teams win because of the athletes who <strong>own the roles no one else wants.</strong>\n\nYour role might be:\n• Coming off the bench with energy\n• Being the defensive stopper\n• Setting the screen so someone else scores\n\nTake Steve Kerr — he averaged about 6 points a game over his career. But in the 1997 NBA Finals, with the title on the line, Michael Jordan passed him the ball — and Kerr hit the shot that won the championship. Why? Because Steve knew his role, prepared for it completely, and executed it without ego.\n\n<strong>Ego fights the role. Excellence masters it.</strong>`,
               highlight: "Trevor Moawad's core teaching: your role is your responsibility — own it completely."
             }
           },
@@ -559,7 +559,7 @@ export const MODULES = [
             label: "Hook",
             emoji: "⚡",
             content: {
-              title: "The athlete who wasted 3 years being angry at the wrong things.",
+              title: "The athlete who wasted 2 years being angry at the wrong things.",
               body: `Marcus was one of the best quarterbacks in his state. Recruited. Talented. Hungry.\n\nHe spent two years furious at his offensive line. They missed blocks. They cost him sacks. He was constantly distracted by what they did wrong.\n\nHis stats tanked. His frustration grew.\n\nThen a mental coach gave him one question that changed everything:\n\n<strong>"Which of those things can you actually control?"</strong>\n\nZero. He couldn't control a single one. He had been burning energy on powerless problems.`,
               question: "What's something in your sport that you spend energy worrying about but can't actually control?"
             }
@@ -641,7 +641,7 @@ export const MODULES = [
             emoji: "⚡",
             content: {
               title: "The tennis player who stopped watching the score.",
-              body: `It was match point. Down two sets. The crowd was silent.\n\nShe had one choice: watch the scoreboard spiral — or play tennis.\n\nShe told herself: <strong>"One ball. One point. That's all that exists."</strong>\n\nShe won that point. Then the next. Then the set. Then the match.\n\nNobody remembers the score at halftime. They remember who played their best game <strong>at the moment it mattered most.</strong>\n\nMoad calls this <strong>Process Focus</strong> — and it's what separates clutch athletes from those who shrink.`,
+              body: `It was match point. Down two sets. The crowd was silent.\n\nShe had one choice: watch the scoreboard spiral — or play tennis.\n\nShe told herself: <strong>"One ball. One point. That's all that exists."</strong>\n\nShe won that point. Then the next. Then the set. Then the match.\n\nNobody remembers the score after the first set. They remember who played their best game <strong>at the moment it mattered most.</strong>\n\nThis is called <strong>Process Focus</strong> — and it's what separates clutch athletes from those who shrink.`,
               question: "Have you ever gotten so focused on the score that you forgot to just play your game?"
             }
           },
@@ -651,7 +651,7 @@ export const MODULES = [
             emoji: "📖",
             content: {
               title: "Process Over Outcome",
-              body: `Here's a counterintuitive truth that elite coaches know:\n\n<strong>The athletes most obsessed with winning often perform worst under pressure.</strong>\n\nWhy? Because the scoreboard is an outcome — and outcomes are outside your circle of control.\n\nYou don't control whether the ball goes in. You control:\n• Your footwork\n• Your release\n• Your follow-through\n• Your mental state\n\nTrevor Moawad has trained elite athletes to forget the scoreboard in-game. Their cue: <strong>play the next play perfectly.</strong>\n\nThe scoreboard takes care of itself when you execute the process.`,
+              body: `Here's a counterintuitive truth that elite coaches know:\n\n<strong>Athletes who fixate on the scoreboard often tighten up under pressure.</strong>\n\nWhy? Because the scoreboard is an outcome — and outcomes are outside your circle of control.\n\nYou don't control whether the ball goes in. You control:\n• Your footwork\n• Your release\n• Your follow-through\n• Your mental state\n\nTrevor Moawad has trained elite athletes to forget the scoreboard in-game. Their cue: <strong>play the next play perfectly.</strong>\n\nThe scoreboard takes care of itself when you execute the process.`,
               highlight: "Trevor Moawad's core teaching: win the play in front of you. The scoreboard takes care of itself."
             }
           },
@@ -689,7 +689,7 @@ export const MODULES = [
                   explanation: "Process focus means your full attention is on the next action — footwork, positioning, release — not the result."
                 },
                 {
-                  q: "According to Moawad, what happens when teams focus on process instead of score?",
+                  q: "What tends to happen when teams focus on process instead of score?",
                   options: ["They lose track of the game", "They make more mistakes", "Their execution improves and results follow ✓", "It has no measurable impact"],
                   correct: 2,
                   explanation: "Process focus leads to better execution. Better execution leads to better results. The scoreboard follows the work."
@@ -722,7 +722,7 @@ export const MODULES = [
             emoji: "⚡",
             content: {
               title: "Your brain gives you 90 seconds.",
-              body: `Neuroscientist Dr. Jill Bolte Taylor discovered something remarkable:\n\nWhen a stressful thing happens, your brain fires an emotional response. Stress hormones flood your system.\n\n<strong>That surge lasts exactly 90 seconds.</strong>\n\nAfter 90 seconds, the chemicals clear — <strong>unless you keep the thought alive</strong>.\n\nEvery time you replay the mistake, complain about the call, or relive the bad moment — you restart the 90-second clock.\n\nElite athletes know this. Moawad teaches it to every team he works with. <strong>Let the 90 seconds pass. Then move.</strong>`,
+              body: `Neuroscientist Dr. Jill Bolte Taylor discovered something remarkable:\n\nWhen a stressful thing happens, your brain fires an emotional response. Stress hormones flood your system.\n\n<strong>That surge lasts about 90 seconds.</strong>\n\nAfter 90 seconds, the chemicals clear — <strong>unless you keep the thought alive</strong>.\n\nEvery time you replay the mistake, complain about the call, or relive the bad moment — you restart the 90-second clock.\n\nElite athletes use this. <strong>Let the 90 seconds pass. Then move.</strong>`,
               question: "Think about your last tough game. How long did you stay upset after a mistake — 30 seconds? 5 minutes? The whole game?"
             }
           },
@@ -732,8 +732,8 @@ export const MODULES = [
             emoji: "📖",
             content: {
               title: "The 90-Second Reset Protocol",
-              body: `Here's the science-backed process Moawad adapts for athletes:\n\n<strong>0–90 seconds:</strong> Feel it. Don't suppress the emotion. Breathe. Let the stress chemicals clear.\n\n<strong>At 90 seconds:</strong> Ask yourself ONE question: <strong>"What's the next controllable?"</strong>\n\n<strong>After 90 seconds:</strong> All mental energy shifts forward. The past moment is done.\n\nThis isn't ignoring your feelings. It's <strong>respecting the biology and then choosing to move forward</strong>.\n\nThe athletes who master this technique average significantly fewer mental errors in the second half of games.`,
-              highlight: "The 90-Second Rule: feel it for 90 seconds, then choose your next move. (Adapted from Dr. Jill Bolte Taylor's research and Trevor Moawad's coaching.)"
+              body: `Here's how athletes can use it:\n\n<strong>0–90 seconds:</strong> Feel it. Don't suppress the emotion. Breathe. Let the stress chemicals clear.\n\n<strong>At 90 seconds:</strong> Ask yourself ONE question: <strong>"What's the next controllable?"</strong>\n\n<strong>After 90 seconds:</strong> All mental energy shifts forward. The past moment is done.\n\nThis isn't ignoring your feelings. It's <strong>respecting the biology and then choosing to move forward</strong>.`,
+              highlight: "The 90-Second Rule: feel it for 90 seconds, then choose your next move. (Adapted from Dr. Jill Bolte Taylor's research, paired with Moawad's neutral thinking.)"
             }
           },
           {
@@ -761,7 +761,7 @@ export const MODULES = [
                   q: "According to Dr. Taylor's research, how long does a stress response naturally last?",
                   options: ["30 seconds", "5 minutes", "90 seconds ✓", "10 minutes"],
                   correct: 2,
-                  explanation: "The chemical stress response lasts 90 seconds. After that, you choose whether to keep it going by replaying the moment."
+                  explanation: "The chemical stress response lasts about 90 seconds. After that, you choose whether to keep it going by replaying the moment."
                 },
                 {
                   q: "What extends the stress response beyond 90 seconds?",
@@ -770,7 +770,7 @@ export const MODULES = [
                   explanation: "Every time you re-think the mistake or unfair call, you restart the stress chemical cycle."
                 },
                 {
-                  q: "After the 90 seconds clear, Moawad's athletes ask themselves:",
+                  q: "After the 90 seconds pass, ask yourself:",
                   options: ['"What went wrong?"', '"What\'s the score?"', '"What\'s the next controllable?" ✓', '"Why did this happen to me?"'],
                   correct: 2,
                   explanation: "Forward-focused questions shift your mental energy immediately. 'What's the next controllable?' pulls your brain into action mode."
@@ -894,6 +894,6 @@ export const COACH_RESPONSES = {
   confidence: "Confidence comes from preparation, not inspiration. Think back: you've put in the work. Your training has prepared you for exactly this moment. Trust the process you've built.",
   reset:      "Here's your 3R Reset: (1) Recognize — notice what happened, take one breath. (2) Release — shake your hands, tap your chest, or say 'next play' out loud. (3) Refocus — lock your eyes on where you need to be. That's it. 3 seconds to a fresh start.",
   pregame:    "Night before a big game: (1) Lay out everything you need so your morning is calm. (2) Spend 3 minutes visualizing one clean play — not the whole game, just one good moment. (3) Review your neutral reset phrase. (4) Get 8 hours of sleep. That's it. Don't overthink it. 🎯",
-  default:    "I'm Coach Neutral — I use Trevor Moad's neutral thinking framework to help you perform better. Ask me about nerves, pressure, mistakes, confidence, or any mental challenge you're facing. What's on your mind? 🧠"
+  default:    "I'm Coach Neutral — I use Trevor Moawad's neutral thinking framework to help you perform better. Ask me about nerves, pressure, mistakes, confidence, or any mental challenge you're facing. What's on your mind? 🧠"
 };
 

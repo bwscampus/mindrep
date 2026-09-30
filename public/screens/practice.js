@@ -246,7 +246,7 @@ function renderCoachTab() {
             </div>
           </div>
           <div class="coach-bubble" style="margin-bottom:0">
-            Hey, I'm Coach Neutral. I use Trevor Moad's neutral thinking framework to help you perform better. Ask me anything about your sport, your mindset, or how to handle a tough moment. 🧠
+            Hey, I'm Coach Neutral. I use Trevor Moawad's neutral thinking framework to help you perform better. Ask me anything about your sport, your mindset, or how to handle a tough moment. 🧠
           </div>
         </div>
 

@@ -150,7 +150,7 @@ export function renderHome(navigate) {
             <div style="border-left:2px solid var(--teal);padding-left:10px;font-size:.87rem;font-family:var(--font-body);color:var(--muted2);line-height:1.55">${b.icon}&nbsp; ${b.text}</div>
           </div>
         `).join('')}
-        <div style="margin-top:14px;font-style:italic;font-size:.8rem;color:var(--muted);font-family:var(--font-body);line-height:1.5">Every lesson in MindRep is adapted from Trevor Moad's mental performance coaching.</div>
+        <div style="margin-top:14px;font-style:italic;font-size:.8rem;color:var(--muted);font-family:var(--font-body);line-height:1.5">Every lesson in MindRep is adapted from Trevor Moawad's mental performance coaching.</div>
       </div>
 
       <div style="height:12px"></div>
