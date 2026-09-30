@@ -987,3 +987,201 @@ body { background: var(--bg); }
 .uppercase{text-transform:uppercase;letter-spacing:.06em}
 .font-display{font-family:var(--font-display)}
 .divider{height:1px;background:var(--border);margin:16px 0}
+
+/* ======================== Lesson audio player ========================
+   Focused listening view. Uses only existing tokens; the ring echoes the
+   logo mark (outer ring = progress, middle ring, filled center). Motion is
+   --ease only, no bounce; see design-notes.md "Audio & Video Lessons". */
+.player {
+  display: flex; flex-direction: column; align-items: center;
+  padding: var(--space-6) 0 var(--space-5);
+  text-align: center;
+}
+.player-ring-wrap {
+  position: relative;
+  width: min(260px, 72vw); aspect-ratio: 1;
+  margin-bottom: var(--space-5);
+}
+.player-ring { width: 100%; height: 100%; transform: rotate(-90deg); }
+.player-ring circle { fill: none; }
+.ring-track    { stroke: var(--bg3); stroke-width: 6; }
+.ring-progress {
+  stroke: var(--accent); stroke-width: 6; stroke-linecap: round;
+  transition: stroke-dashoffset 300ms linear;
+}
+.ring-mid {
+  stroke: var(--accent-2); stroke-width: 5; opacity: 0.18;
+  transition: opacity var(--duration-slow) var(--ease);
+}
+/* A slow breath on the middle ring while the voice is speaking. */
+.player.is-playing .ring-mid { animation: breathPulse 6s var(--ease) infinite; }
+.player.is-complete .ring-mid { opacity: 0.35; }
+
+.player-play {
+  position: absolute; inset: 0; margin: auto;
+  width: 38%; height: 38%;
+  border-radius: 50%; border: none; cursor: pointer;
+  background: var(--accent); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--shadow-teal);
+  transition: background var(--duration-base) var(--ease), transform var(--duration-fast) var(--ease);
+}
+.player-play:hover { background: #35609E; }
+.player-play:active { transform: scale(0.97); }
+.player-play:disabled { background: var(--accent-3); cursor: default; box-shadow: none; }
+.player-play svg { width: 34%; height: 34%; }
+.player-play[data-icon="play"] svg { transform: translateX(6%); }
+.player-play:focus-visible,
+.player-ctl:focus-visible,
+.player-speed:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+.player-status {
+  min-height: 1.4em;
+  font-size: 0.85rem; color: var(--muted);
+  margin-bottom: var(--space-4);
+}
+
+.player-time {
+  width: 100%; max-width: 360px;
+  display: flex; justify-content: space-between;
+  font-family: var(--font-numeral); font-size: 0.75rem; font-weight: 500;
+  color: var(--muted); font-variant-numeric: tabular-nums;
+  margin-bottom: var(--space-2);
+}
+
+/* Thin scrubber. --pct is set from JS so the filled part is solid accent. */
+.player-scrub {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; max-width: 360px; height: 20px;
+  background: transparent; cursor: pointer; margin: 0;
+}
+.player-scrub::-webkit-slider-runnable-track {
+  height: 4px; border-radius: 2px;
+  background: linear-gradient(to right, var(--accent) var(--pct, 0%), var(--bg3) var(--pct, 0%));
+}
+.player-scrub::-moz-range-track { height: 4px; border-radius: 2px; background: var(--bg3); }
+.player-scrub::-moz-range-progress { height: 4px; border-radius: 2px; background: var(--accent); }
+.player-scrub::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 14px; height: 14px; margin-top: -5px;
+  border-radius: 50%; background: var(--accent); border: 2px solid var(--bg);
+  box-shadow: var(--shadow);
+}
+.player-scrub::-moz-range-thumb {
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--accent); border: 2px solid var(--bg);
+}
+.player-scrub:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 4px; }
+
+.player-controls {
+  display: flex; align-items: center; justify-content: center;
+  gap: var(--space-6);
+  margin-top: var(--space-4);
+}
+.player-ctl {
+  position: relative;
+  width: 48px; height: 48px;
+  border: none; background: transparent; cursor: pointer;
+  color: var(--muted2); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  transition: color var(--duration-fast) var(--ease), background var(--duration-fast) var(--ease);
+}
+.player-ctl:hover { color: var(--accent); background: var(--accent-dim); }
+.player-ctl svg { width: 30px; height: 30px; }
+.player-ctl span {
+  position: absolute; font-family: var(--font-numeral);
+  font-size: 0.6rem; font-weight: 600; letter-spacing: 0;
+}
+.player-speed {
+  min-width: 64px; height: 36px; padding: 0 var(--space-3);
+  border: 1px solid var(--border-bright); border-radius: 50px;
+  background: transparent; cursor: pointer;
+  font-family: var(--font-numeral); font-size: 0.82rem; font-weight: 600;
+  color: var(--text); font-variant-numeric: tabular-nums;
+  transition: border-color var(--duration-fast) var(--ease), color var(--duration-fast) var(--ease);
+}
+.player-speed:hover { border-color: var(--accent); color: var(--accent); }
+
+.player-ambient {
+  display: flex; align-items: center; gap: var(--space-3);
+  width: 100%; max-width: 280px;
+  margin-top: var(--space-5);
+  color: var(--muted);
+}
+.player-ambient svg { width: 20px; height: 20px; flex-shrink: 0; }
+.player-ambient-label { font-size: 0.78rem; font-weight: 500; }
+.player-ambient input { flex: 1; min-width: 0; }
+
+.player-complete {
+  width: 100%; max-width: 360px;
+  margin-top: var(--space-6);
+  animation: fadeIn var(--duration-slow) var(--ease);
+}
+.player-complete[hidden] { display: none; }
+.player-complete-title {
+  font-family: var(--font-display); font-weight: 600;
+  font-size: 1.25rem; letter-spacing: -0.005em; color: var(--text);
+  margin-bottom: var(--space-2);
+}
+.player-complete-sub {
+  font-size: 0.9rem; color: var(--muted); line-height: 1.6;
+  margin-bottom: var(--space-5);
+}
+.player-complete .btn + .btn { margin-top: var(--space-3); }
+
+.read-along {
+  border-top: 1px solid var(--border);
+  padding-top: var(--space-6); margin-top: var(--space-2);
+}
+.read-along-label {
+  font-family: var(--font-display); font-size: 0.68rem; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
+  margin-bottom: var(--space-4);
+}
+.read-along .lesson-title { font-size: 1.2rem; margin: var(--space-5) 0 var(--space-3); }
+.read-along .lesson-title:first-of-type { margin-top: 0; }
+
+/* Entry point on a narrated lesson's first screen. */
+.listen-cta { display: flex; gap: var(--space-3); margin-bottom: var(--space-3); }
+.listen-cta .btn-primary { flex: 1; }
+.listen-cta .btn-secondary { flex: .6; }
+.listen-meta { font-size: 0.8rem; color: var(--muted); text-align: center; margin-bottom: var(--space-5); }
+
+/* ======================== Lesson video ======================== */
+.lesson-video {
+  position: relative; aspect-ratio: 16 / 9;
+  border-radius: var(--radius); overflow: hidden;
+  background: var(--bg3); border: 1px solid var(--border);
+  margin-bottom: var(--space-4);
+}
+.lesson-video iframe,
+.lesson-video video { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.lesson-video-caption { font-size: 0.8rem; color: var(--muted); margin: calc(-1 * var(--space-2)) 0 var(--space-4); }
+
+/* ======================== Watch further (Trevor Moawad) ======================== */
+.watch-further { margin: var(--space-2) 0 var(--space-5); }
+.watch-further-label {
+  font-family: var(--font-display); font-size: 0.68rem; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);
+  margin-bottom: var(--space-3);
+}
+.watch-card {
+  display: flex; gap: var(--space-3); align-items: center;
+  padding: var(--space-3); margin-bottom: var(--space-2);
+  border: 1px solid var(--border); border-radius: var(--radius-sm);
+  background: var(--card); color: var(--text); text-decoration: none;
+  transition: border-color var(--duration-fast) var(--ease);
+}
+.watch-card:hover { border-color: var(--accent); }
+.watch-card img {
+  width: 112px; aspect-ratio: 16 / 9; object-fit: cover;
+  border-radius: var(--radius-xs); background: var(--bg3); flex-shrink: 0;
+}
+.watch-card-title { font-size: 0.88rem; font-weight: 600; line-height: 1.35; margin-bottom: 4px; }
+.watch-card-credit { font-size: 0.75rem; color: var(--muted); }
+.watch-further-note { font-size: 0.72rem; color: var(--muted); margin-top: var(--space-2); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ring-progress, .ring-mid, .player-play, .player-complete { transition: none; animation: none; }
+  .player.is-playing .ring-mid { animation: none; opacity: 0.28; }
+}

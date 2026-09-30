@@ -5,6 +5,9 @@ import { getProgress, saveProgress } from '../utils/storage.js';
 import { completeLesson, checkAndUnlockBadges, fireConfetti, showToast, floatXP } from '../utils/gamification.js';
 import { isAdmin } from '../utils/admin.js';
 import { moduleIcon } from '../utils/illustrations.js';
+import { closeSession, pauseActive, getListenState, formatTime } from '../utils/lessonAudio.js';
+import { mountLessonPlayer } from './lessonPlayer.js';
+import { renderLessonVideo, renderWatchFurther } from '../utils/lessonMedia.js';
 
 let currentSection = 0;
 let lessonData = null;
@@ -16,9 +19,17 @@ let sliderValues = {};
 let builderSelections = {};
 let swipedCards = new Set();
 let navigateFn = null;
+// Narrated lessons: whether the focused listening view is showing, and how
+// to detach its UI when the screen re-renders.
+let listening = false;
+let unmountPlayer = null;
 
 export function renderLesson(lessonId, navigate) {
-  navigateFn = navigate;
+  // Any way out of the lesson stops its audio. (Inside the lesson, moving
+  // between sections only pauses it, so the athlete can come back to it.)
+  navigateFn = (...args) => { closeSession(); navigate(...args); };
+  navigate = navigateFn;
+  listening = false;
   currentSection = 0;
   quizAnswers = [];
   quizPerfect = false;
@@ -28,6 +39,8 @@ export function renderLesson(lessonId, navigate) {
   swipedCards = new Set();
 
   // Find lesson
+  lessonData = null;
+  moduleData = null;
   for (const mod of MODULES) {
     for (const l of mod.lessons) {
       if (l.id === lessonId) {
@@ -67,6 +80,7 @@ export function renderLesson(lessonId, navigate) {
 function renderSection() {
   const app = document.getElementById('app');
   const section = lessonData.sections[currentSection];
+  if (unmountPlayer) { unmountPlayer(); unmountPlayer = null; }
   const totalSections = lessonData.sections.length;
 
   app.innerHTML = `
@@ -93,16 +107,76 @@ function renderSection() {
 
       <!-- Section content -->
       <div class="lesson-content" id="lesson-content">
-        ${renderSectionContent(section)}
+        ${listening ? '' : renderSectionContent(section)}
       </div>
     </div>
   `;
 
   document.getElementById('lesson-back')?.addEventListener('click', () => {
+    if (listening) { closeListening(); return; }
     if (currentSection > 0) { currentSection--; renderSection(); }
     else navigateFn('home');
   });
+
+  if (listening) {
+    const activityIndex = lessonData.sections.findIndex(s => s.type === 'activity');
+    unmountPlayer = mountLessonPlayer(document.getElementById('lesson-content'), {
+      lesson: lessonData,
+      moduleTitle: `Module ${moduleData.id} · ${moduleData.title}`,
+      readAlong: renderReadAlong(),
+      continueLabel: activityIndex >= 0 ? 'Continue to activity →' : 'Continue →',
+      onContinue: () => {
+        listening = false;
+        currentSection = activityIndex >= 0 ? activityIndex : Math.min(1, lessonData.sections.length - 1);
+        renderSection();
+      }
+    });
+    return;
+  }
   attachSectionEvents(section);
+}
+
+// --- Narrated lessons -------------------------------------------------------
+
+function openListening() {
+  listening = true;
+  currentSection = 0;
+  renderSection();
+  window.scrollTo({ top: 0 });
+}
+
+// Leaving the listening view eases the audio down (the session keeps its
+// position), and returns to the lesson's first screen.
+function closeListening() {
+  listening = false;
+  pauseActive();
+  renderSection();
+}
+
+// The narration covers the hook and the lesson; the activity, quiz and
+// tie-in stay interactive screens after it.
+function renderReadAlong() {
+  return lessonData.sections
+    .filter(s => s.type === 'hook' || s.type === 'instruction')
+    .map(s => `
+      <div class="lesson-title">${s.content.title}</div>
+      <div class="lesson-body">${s.content.body.replace(/\n/g, '<br>')}</div>
+      ${s.content.highlight ? `<div class="lesson-highlight">${s.content.highlight}</div>` : ''}
+    `).join('');
+}
+
+function renderListenCta() {
+  const saved = getListenState(lessonData.id);
+  const meta = saved.position > 0
+    ? `Picks up at ${formatTime(saved.position)}`
+    : `About ${lessonData.duration} min · headphones recommended`;
+  return `
+    <div class="listen-cta">
+      <button class="btn btn-primary btn-lg" id="listen-open">Listen to lesson</button>
+      <button class="btn btn-secondary btn-lg" id="section-next">Read</button>
+    </div>
+    <div class="listen-meta">${meta}</div>
+  `;
 }
 
 function renderSectionContent(section) {
@@ -131,13 +205,16 @@ function renderHook(section) {
       <div class="lesson-body">${c.body.replace(/\n/g, '<br>')}</div>
       ${c.question ? `<div class="lesson-highlight mt-16">💭 ${c.question}</div>` : ''}
     </div>
-    <button class="btn btn-primary btn-block btn-lg" id="section-next">Start Lesson →</button>
+    ${lessonData.audioUrl
+      ? renderListenCta()
+      : `<button class="btn btn-primary btn-block btn-lg" id="section-next">Start Lesson →</button>`}
   `;
 }
 
 function renderInstruction(section) {
   const c = section.content;
   return `
+    ${renderLessonVideo(lessonData)}
     <div class="lesson-card glass" style="margin-bottom:16px">
       <div class="lesson-section-tag">${section.emoji} ${section.label}</div>
       <div class="lesson-title">${c.title}</div>
@@ -290,6 +367,7 @@ function renderTieIn(section) {
         </div>
       ` : ''}
     </div>
+    ${renderWatchFurther(lessonData)}
     <button class="btn ${isComplete ? 'btn-gold' : 'btn-primary'} btn-block btn-lg" id="section-next">
       ${isComplete ? '🏆 Finish Module!' : 'Complete Lesson ✓'}
     </button>
@@ -303,8 +381,13 @@ function attachSectionEvents(section) {
   // binding here would stack a new listener on the same button every question
   // and make one tap skip multiple sections.
 
-  // Narrate
+  // Narrated lesson: open the listening view
+  document.getElementById('listen-open')?.addEventListener('click', openListening);
+
+  // Narrate — a lesson with recorded audio opens the player; otherwise the
+  // browser's built-in speech reads this section, as before.
   document.getElementById('narrate-btn')?.addEventListener('click', () => {
+    if (lessonData.audioUrl) { openListening(); return; }
     if ('speechSynthesis' in window) {
       const c = section.content;
       const text = c.body.replace(/<[^>]+>/g, '').replace(/\n/g, ' ');

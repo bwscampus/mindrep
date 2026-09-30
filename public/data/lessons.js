@@ -14,6 +14,21 @@ export const MODULES = [
         title: "Why Your Mind Matters",
         duration: 5,
         xp: 50,
+        // Narration (optional). Add the file and uncomment to turn on the
+        // listening view for this lesson; see README "Lesson audio & video".
+        // audioUrl: "audio/lessons/1.1-why-your-mind-matters.mp3",
+        // ambientUrl: "audio/ambient/soft-pad.mp3",
+        // Test clip slot: paste the YouTube/Vimeo link into embedUrl. An empty
+        // embedUrl renders nothing, so the lesson looks exactly as before.
+        video: {
+          embedUrl: "",
+          title: "Why your mind matters",
+          caption: ""
+        },
+        watchFurther: [
+          { youtubeId: "FYsoS2D72gI", title: "Limitless Minds: Meet Trevor Moawad", channel: "Russell Wilson" },
+          { youtubeId: "ZY_2yDyu4qs", title: "Trevor Moawad on Mental Conditioning", channel: "CBS Sports" }
+        ],
         sections: [
           {
             type: "hook",
@@ -31,7 +46,7 @@ export const MODULES = [
             emoji: "📖",
             content: {
               title: "Your Mind is a Muscle",
-              body: `Here's something most athletes don't know: <strong>mental skills are trainable</strong> — just like speed, strength, or technique.\n\nTrevor Moad, one of the world's top mental performance coaches, worked with NFL players, Olympians, and elite military units. His #1 finding?\n\n<strong>The mind controls the body — and you can train your mind.</strong>\n\nResearch shows that athletes who practice mental skills perform better under pressure, recover faster from mistakes, and feel more confident on game day.\n\nThis app is your 30-day mental training camp. A few minutes a day. Real results.`,
+              body: `Here's something most athletes don't know: <strong>mental skills are trainable</strong> — just like speed, strength, or technique.\n\nTrevor Moawad, one of the world's top mental performance coaches, worked with NFL players, Olympians, and elite military units. His #1 finding?\n\n<strong>The mind controls the body — and you can train your mind.</strong>\n\nResearch shows that athletes who practice mental skills perform better under pressure, recover faster from mistakes, and feel more confident on game day.\n\nThis app is your 30-day mental training camp. A few minutes a day. Real results.`,
               highlight: "\"The most important muscle you develop is the one between your ears.\" — Sports Psychology Research"
             }
           },
@@ -63,7 +78,7 @@ export const MODULES = [
                   explanation: "Mental skills are 100% trainable! Just like lifting weights builds muscles, practicing mental techniques builds your mental game."
                 },
                 {
-                  q: "What did Trevor Moad find about elite athletes?",
+                  q: "What did Trevor Moawad find about elite athletes?",
                   options: ["They never feel nervous", "They avoid pressure situations", "They train their minds just like their bodies ✓", "They rely only on natural talent"],
                   correct: 2,
                   explanation: "Elite athletes consistently use mental training as a core part of their preparation."
@@ -95,6 +110,10 @@ export const MODULES = [
         title: "Neutral Thinking",
         duration: 5,
         xp: 60,
+        watchFurther: [
+          { youtubeId: "jEj54Rd8CG4", title: "Limitless Minds: The Power of Your Voice and Neutral Thinking", channel: "Russell Wilson" },
+          { youtubeId: "5lCeWtXPKko", title: "How to Break the Addiction to Negative Thoughts & Emotions", channel: "Tom Bilyeu" }
+        ],
         sections: [
           {
             type: "hook",
@@ -112,7 +131,7 @@ export const MODULES = [
             emoji: "📖",
             content: {
               title: "Think Neutral, Not Negative",
-              body: `Trevor Moad's most powerful concept: <strong>Neutral Thinking</strong>.\n\nHere's how it works:\n\n❌ <strong>Negative:</strong> "I missed that shot. I'm the worst. This team deserves better than me."\n\n😐 <strong>Neutral:</strong> "I missed that shot. The next one is all that matters."\n\n✅ <strong>Positive:</strong> (Can work but sometimes feels fake under pressure)\n\nNeutral thinking is powerful because it's <strong>factual and forward-moving</strong>. You don't pretend the mistake didn't happen. You just don't let it write your story.\n\nThe past is not predictive. <strong>The next moment is all you control.</strong>`,
+              body: `Trevor Moawad's most powerful concept: <strong>Neutral Thinking</strong>.\n\nHere's how it works:\n\n❌ <strong>Negative:</strong> "I missed that shot. I'm the worst. This team deserves better than me."\n\n😐 <strong>Neutral:</strong> "I missed that shot. The next one is all that matters."\n\n✅ <strong>Positive:</strong> (Can work but sometimes feels fake under pressure)\n\nNeutral thinking is powerful because it's <strong>factual and forward-moving</strong>. You don't pretend the mistake didn't happen. You just don't let it write your story.\n\nThe past is not predictive. <strong>The next moment is all you control.</strong>`,
               highlight: "Facts → Accept → Next Action. That's the neutral loop."
             }
           },
@@ -176,6 +195,9 @@ export const MODULES = [
         title: "The Reset Button",
         duration: 5,
         xp: 70,
+        watchFurther: [
+          { youtubeId: "o-vIcA2va1U", title: "The Past Is Not Predictive (on Impact Theory)", channel: "Moawad Consulting Group" }
+        ],
         sections: [
           {
             type: "hook",
@@ -286,7 +308,7 @@ export const MODULES = [
             emoji: "⚡",
             content: {
               title: "The athlete who had every reason to quit.",
-              body: `Kyle Long was cut from four college football rosters. Division I coaches told him he was too slow. Too soft. Not built for the next level.\n\nHe didn't argue. He didn't blame anyone.\n\nHe just showed up — every single day — and did the work.\n\nThree years later, he was a <strong>first-round NFL draft pick</strong>.\n\nThe difference wasn't talent. It was a mindset Moad calls <strong>"It Takes What It Takes."</strong>`,
+              body: `Kyle Long was cut from four college football rosters. Division I coaches told him he was too slow. Too soft. Not built for the next level.\n\nHe didn't argue. He didn't blame anyone.\n\nHe just showed up — every single day — and did the work.\n\nThree years later, he was a <strong>first-round NFL draft pick</strong>.\n\nThe difference wasn't talent. It was a mindset Moawad calls <strong>"It Takes What It Takes."</strong>`,
               question: "Have you ever used an excuse — weather, teammates, coaches — to explain a bad performance?"
             }
           },
@@ -296,8 +318,8 @@ export const MODULES = [
             emoji: "📖",
             content: {
               title: "Excuses Kill Potential",
-              body: `Trevor Moad identified a pattern among athletes who never reach their potential: <strong>they outsource their results.</strong>\n\nExcuses sound like:\n❌ "The ref was unfair."\n❌ "My teammates didn't show up."\n❌ "I didn't sleep well."\n\nNone of these are necessarily false. But the moment you give them power over your performance, <strong>you give away your control.</strong>\n\n"It Takes What It Takes" means this: whatever the circumstances, <strong>you still choose your response.</strong>\n\nThe conditions don't decide. You decide.`,
-              highlight: "Trevor Moad's core teaching: take responsibility for what you can control — no matter the circumstances."
+              body: `Trevor Moawad identified a pattern among athletes who never reach their potential: <strong>they outsource their results.</strong>\n\nExcuses sound like:\n❌ "The ref was unfair."\n❌ "My teammates didn't show up."\n❌ "I didn't sleep well."\n\nNone of these are necessarily false. But the moment you give them power over your performance, <strong>you give away your control.</strong>\n\n"It Takes What It Takes" means this: whatever the circumstances, <strong>you still choose your response.</strong>\n\nThe conditions don't decide. You decide.`,
+              highlight: "Trevor Moawad's core teaching: take responsibility for what you can control — no matter the circumstances."
             }
           },
           {
@@ -367,7 +389,7 @@ export const MODULES = [
             emoji: "⚡",
             content: {
               title: "The most gifted player on the team — who quit.",
-              body: `Every team has one. The kid who's naturally faster, stronger, and more skilled than everyone else.\n\nBy sophomore year, coaches were calling him a future Division I star.\n\nBy senior year, he was off the team.\n\nNot because he lost his talent. Because <strong>he stopped working</strong>.\n\nMeanwhile, the kid who got cut from JV twice made varsity on effort alone.\n\nTrevor Moad's coaching experience makes it clear: <strong>talent without work is just potential. Effort is what turns potential into results.</strong>`,
+              body: `Every team has one. The kid who's naturally faster, stronger, and more skilled than everyone else.\n\nBy sophomore year, coaches were calling him a future Division I star.\n\nBy senior year, he was off the team.\n\nNot because he lost his talent. Because <strong>he stopped working</strong>.\n\nMeanwhile, the kid who got cut from JV twice made varsity on effort alone.\n\nTrevor Moawad's coaching experience makes it clear: <strong>talent without work is just potential. Effort is what turns potential into results.</strong>`,
               question: "Have you ever been out-worked by someone less talented than you? What happened?"
             }
           },
@@ -377,7 +399,7 @@ export const MODULES = [
             emoji: "📖",
             content: {
               title: "Effort is a Superpower",
-              body: `Here's the truth about talent that no one tells you:\n\n<strong>Talent is common. Maximum effort is rare.</strong>\n\nIn Moad's work with elite teams, the athletes who stuck around longest weren't always the most gifted. They were the ones who:\n\n✅ Stayed an extra 15 minutes after every practice\n✅ Showed up when they didn't feel like it\n✅ Competed in practice the same way they competed in games\n\nNFL data backs this up: players who showed elite effort metrics in practice outperformed equally talented players in games by a measurable margin.\n\n<strong>Effort is the one performance variable you control 100% of the time.</strong>`,
+              body: `Here's the truth about talent that no one tells you:\n\n<strong>Talent is common. Maximum effort is rare.</strong>\n\nIn Moawad's work with elite teams, the athletes who stuck around longest weren't always the most gifted. They were the ones who:\n\n✅ Stayed an extra 15 minutes after every practice\n✅ Showed up when they didn't feel like it\n✅ Competed in practice the same way they competed in games\n\nNFL data backs this up: players who showed elite effort metrics in practice outperformed equally talented players in games by a measurable margin.\n\n<strong>Effort is the one performance variable you control 100% of the time.</strong>`,
               highlight: '"Hard work beats talent when talent doesn\'t work hard." — Tim Notke (popularized by Kevin Durant)'
             }
           },
@@ -403,7 +425,7 @@ export const MODULES = [
             content: {
               questions: [
                 {
-                  q: "According to Trevor Moad's coaching experience, what do the athletes who last longest have in common?",
+                  q: "According to Trevor Moawad's coaching experience, what do the athletes who last longest have in common?",
                   options: ["The most natural talent", "The best coaches", "Consistent maximum effort ✓", "The most experience"],
                   correct: 2,
                   explanation: "Consistent effort outlasts natural talent. The ones who keep showing up and working hard build careers."
@@ -459,7 +481,7 @@ export const MODULES = [
             content: {
               title: "Master the Role You Have",
               body: `Every team has a star. But teams win because of the athletes who <strong>own the roles no one else wants.</strong>\n\nYour role might be:\n• Coming off the bench with energy\n• Being the defensive stopper\n• Setting the screen so someone else scores\n\nTake Steve Kerr — a player who averaged just 7 points per game — but shot the biggest shots of his career when it mattered. Why? Because Steve knew his role, prepared for it completely, and executed it without ego.\n\n<strong>Ego fights the role. Excellence masters it.</strong>`,
-              highlight: "Trevor Moad's core teaching: your role is your responsibility — own it completely."
+              highlight: "Trevor Moawad's core teaching: your role is your responsibility — own it completely."
             }
           },
           {
@@ -496,7 +518,7 @@ export const MODULES = [
                   explanation: "Ego says 'I deserve more.' Excellence says 'I'll be the best at what I have.' Excellence earns more."
                 },
                 {
-                  q: "According to Moad, what do athletes who master small roles eventually earn?",
+                  q: "According to Moawad, what do athletes who master small roles eventually earn?",
                   options: ["A contract", "Bigger roles ✓", "Immediate starting positions", "Media attention"],
                   correct: 1,
                   explanation: "Coaches trust athletes who handle responsibility well. Small role mastery leads to bigger opportunities."
@@ -548,7 +570,7 @@ export const MODULES = [
             emoji: "📖",
             content: {
               title: "Two Circles. One Choice.",
-              body: `Moad teaches athletes to divide everything into two circles:\n\n<strong>🎯 Circle of Control:</strong> Your effort, attitude, preparation, focus, how you respond to mistakes.\n\n<strong>🚫 Outside Your Control:</strong> Weather, referees, opponents, coaches' decisions, crowd, teammates' performance.\n\nHere's the key insight from sports psychology: <strong>athletes who focus energy inside their circle perform better under pressure.</strong>\n\nEvery mental rep you spend worrying about what's outside your control is a rep wasted. Your brain only has so much focus. <strong>Spend it where it counts.</strong>`,
+              body: `Moawad teaches athletes to divide everything into two circles:\n\n<strong>🎯 Circle of Control:</strong> Your effort, attitude, preparation, focus, how you respond to mistakes.\n\n<strong>🚫 Outside Your Control:</strong> Weather, referees, opponents, coaches' decisions, crowd, teammates' performance.\n\nHere's the key insight from sports psychology: <strong>athletes who focus energy inside their circle perform better under pressure.</strong>\n\nEvery mental rep you spend worrying about what's outside your control is a rep wasted. Your brain only has so much focus. <strong>Spend it where it counts.</strong>`,
               highlight: '"Focus where you have power. Release where you don\'t." — Sports Psychology Principle'
             }
           },
@@ -629,8 +651,8 @@ export const MODULES = [
             emoji: "📖",
             content: {
               title: "Process Over Outcome",
-              body: `Here's a counterintuitive truth that elite coaches know:\n\n<strong>The athletes most obsessed with winning often perform worst under pressure.</strong>\n\nWhy? Because the scoreboard is an outcome — and outcomes are outside your circle of control.\n\nYou don't control whether the ball goes in. You control:\n• Your footwork\n• Your release\n• Your follow-through\n• Your mental state\n\nTrevor Moad has trained elite athletes to forget the scoreboard in-game. Their cue: <strong>play the next play perfectly.</strong>\n\nThe scoreboard takes care of itself when you execute the process.`,
-              highlight: "Trevor Moad's core teaching: win the play in front of you. The scoreboard takes care of itself."
+              body: `Here's a counterintuitive truth that elite coaches know:\n\n<strong>The athletes most obsessed with winning often perform worst under pressure.</strong>\n\nWhy? Because the scoreboard is an outcome — and outcomes are outside your circle of control.\n\nYou don't control whether the ball goes in. You control:\n• Your footwork\n• Your release\n• Your follow-through\n• Your mental state\n\nTrevor Moawad has trained elite athletes to forget the scoreboard in-game. Their cue: <strong>play the next play perfectly.</strong>\n\nThe scoreboard takes care of itself when you execute the process.`,
+              highlight: "Trevor Moawad's core teaching: win the play in front of you. The scoreboard takes care of itself."
             }
           },
           {
@@ -667,7 +689,7 @@ export const MODULES = [
                   explanation: "Process focus means your full attention is on the next action — footwork, positioning, release — not the result."
                 },
                 {
-                  q: "According to Moad, what happens when teams focus on process instead of score?",
+                  q: "According to Moawad, what happens when teams focus on process instead of score?",
                   options: ["They lose track of the game", "They make more mistakes", "Their execution improves and results follow ✓", "It has no measurable impact"],
                   correct: 2,
                   explanation: "Process focus leads to better execution. Better execution leads to better results. The scoreboard follows the work."
@@ -700,7 +722,7 @@ export const MODULES = [
             emoji: "⚡",
             content: {
               title: "Your brain gives you 90 seconds.",
-              body: `Neuroscientist Dr. Jill Bolte Taylor discovered something remarkable:\n\nWhen a stressful thing happens, your brain fires an emotional response. Stress hormones flood your system.\n\n<strong>That surge lasts exactly 90 seconds.</strong>\n\nAfter 90 seconds, the chemicals clear — <strong>unless you keep the thought alive</strong>.\n\nEvery time you replay the mistake, complain about the call, or relive the bad moment — you restart the 90-second clock.\n\nElite athletes know this. Moad teaches it to every team he works with. <strong>Let the 90 seconds pass. Then move.</strong>`,
+              body: `Neuroscientist Dr. Jill Bolte Taylor discovered something remarkable:\n\nWhen a stressful thing happens, your brain fires an emotional response. Stress hormones flood your system.\n\n<strong>That surge lasts exactly 90 seconds.</strong>\n\nAfter 90 seconds, the chemicals clear — <strong>unless you keep the thought alive</strong>.\n\nEvery time you replay the mistake, complain about the call, or relive the bad moment — you restart the 90-second clock.\n\nElite athletes know this. Moawad teaches it to every team he works with. <strong>Let the 90 seconds pass. Then move.</strong>`,
               question: "Think about your last tough game. How long did you stay upset after a mistake — 30 seconds? 5 minutes? The whole game?"
             }
           },
@@ -710,8 +732,8 @@ export const MODULES = [
             emoji: "📖",
             content: {
               title: "The 90-Second Reset Protocol",
-              body: `Here's the science-backed process Moad adapts for athletes:\n\n<strong>0–90 seconds:</strong> Feel it. Don't suppress the emotion. Breathe. Let the stress chemicals clear.\n\n<strong>At 90 seconds:</strong> Ask yourself ONE question: <strong>"What's the next controllable?"</strong>\n\n<strong>After 90 seconds:</strong> All mental energy shifts forward. The past moment is done.\n\nThis isn't ignoring your feelings. It's <strong>respecting the biology and then choosing to move forward</strong>.\n\nThe athletes who master this technique average significantly fewer mental errors in the second half of games.`,
-              highlight: "The 90-Second Rule: feel it for 90 seconds, then choose your next move. (Adapted from Dr. Jill Bolte Taylor's research and Trevor Moad's coaching.)"
+              body: `Here's the science-backed process Moawad adapts for athletes:\n\n<strong>0–90 seconds:</strong> Feel it. Don't suppress the emotion. Breathe. Let the stress chemicals clear.\n\n<strong>At 90 seconds:</strong> Ask yourself ONE question: <strong>"What's the next controllable?"</strong>\n\n<strong>After 90 seconds:</strong> All mental energy shifts forward. The past moment is done.\n\nThis isn't ignoring your feelings. It's <strong>respecting the biology and then choosing to move forward</strong>.\n\nThe athletes who master this technique average significantly fewer mental errors in the second half of games.`,
+              highlight: "The 90-Second Rule: feel it for 90 seconds, then choose your next move. (Adapted from Dr. Jill Bolte Taylor's research and Trevor Moawad's coaching.)"
             }
           },
           {
@@ -748,7 +770,7 @@ export const MODULES = [
                   explanation: "Every time you re-think the mistake or unfair call, you restart the stress chemical cycle."
                 },
                 {
-                  q: "After the 90 seconds clear, Moad's athletes ask themselves:",
+                  q: "After the 90 seconds clear, Moawad's athletes ask themselves:",
                   options: ['"What went wrong?"', '"What\'s the score?"', '"What\'s the next controllable?" ✓', '"Why did this happen to me?"'],
                   correct: 2,
                   explanation: "Forward-focused questions shift your mental energy immediately. 'What's the next controllable?' pulls your brain into action mode."

@@ -82,6 +82,59 @@ only the Resend account owner's own address.
 whether or not delivery succeeds. Anything else would let anyone probe which
 email addresses have accounts.
 
+## Lesson audio & video
+
+Every media field is optional. A lesson without them looks and behaves exactly
+as it did before.
+
+```js
+// public/data/lessons.js, on a lesson object
+audioUrl:   "audio/lessons/1.1-why-your-mind-matters.mp3", // narration
+ambientUrl: "audio/ambient/soft-pad.mp3",                   // quiet looping bed
+video: {
+  embedUrl:    "https://www.youtube.com/watch?v=…",  // or a vimeo.com link
+  title:       "What neutral looks like",
+  caption:     "",                                   // optional line under it
+  // Only if not using an embed:
+  src:         "https://…/clip.mp4",
+  captionsUrl: "https://…/clip.en.vtt"
+},
+watchFurther: [{ youtubeId: "…", title: "…", channel: "…" }]
+```
+
+- **`audioUrl`**: turns on the listening view (`screens/lessonPlayer.js`,
+  engine in `utils/lessonAudio.js`). It covers the hook and lesson sections,
+  and the activity, quiz and tie-in follow it. Resume positions sync in
+  `progress.lessonAudio`.
+- **`ambientUrl`**: an optional loop under the voice with its own volume
+  control (default 25%). It fades in on play and out when the narration ends.
+- **`video`**: shows above the lesson text. YouTube links are embedded from
+  `youtube-nocookie.com` with captions on. Vimeo works too. Embeds are
+  preferred over hosting files.
+- **`watchFurther`**: link-out cards credited to Trevor Moawad and the channel
+  that published each video. Link only: never download, rehost, or generate
+  synthetic audio or video of him.
+
+**Narration files.** Use MP3, mono, 64–96 kbps, loudness around −16 LUFS. Put
+lesson files in `public/audio/lessons/` and ambient beds in
+`public/audio/ambient/`. Bake a ~1s fade and 1–2s of silence into both ends of
+each narration file. The player fades in code too, but **iOS Safari doesn't
+allow volume changes from code**, so on iPhone the file's own fades are the
+only ones. Mix ambient beds about 18–24 dB under the voice, and make them loop
+without a seam.
+
+**Hosting elsewhere.** Audio on another domain (a CDN bucket) needs that
+origin in `CSP_MEDIA_SRC_EXTRA`. Video hosts other than YouTube and Vimeo need
+`CSP_FRAME_SRC_EXTRA` (see `app/config.py`).
+
+**Platform notes.**
+- Narration keeps playing with the screen locked, and lock-screen controls
+  (play/pause, ±15s, scrubbing) work on iOS Safari 15+ and Android Chrome.
+- On iOS the ambient bed runs through Web Audio, so it can pause while the
+  phone is locked. The voice continues.
+- The completion haptic is a single short pulse where the Vibration API
+  exists, which is Android only.
+
 ## Deploying
 
 Live at **https://mindrep-production-ad66.up.railway.app**
