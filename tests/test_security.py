@@ -53,3 +53,14 @@ def test_railway_database_url_is_coerced_to_asyncpg():
     settings = Settings(DATABASE_URL="postgresql://u:p@host:5432/db")
     assert settings.DATABASE_URL.startswith("postgresql+asyncpg://")
     assert settings.sync_database_url.startswith("postgresql://")
+
+
+def test_csp_allows_lesson_media_and_video_embeds():
+    csp = Settings(CSP_MEDIA_SRC_EXTRA="https://cdn.example.com").content_security_policy()
+    directives = dict(d.strip().split(" ", 1) for d in csp.split(";"))
+    assert directives["media-src"] == "'self' https://cdn.example.com"
+    assert "https://www.youtube-nocookie.com" in directives["frame-src"]
+    assert "https://player.vimeo.com" in directives["frame-src"]
+    assert "https://i.ytimg.com" in directives["img-src"]
+    # Embedding is one-way: nobody may frame MindRep itself.
+    assert directives["frame-ancestors"] == "'none'"

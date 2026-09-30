@@ -68,6 +68,10 @@ class Settings(BaseSettings):
     CSP_FONT_SRC_EXTRA: CsvList = Field(default_factory=list)
     CSP_IMG_SRC_EXTRA: CsvList = Field(default_factory=list)
     CSP_CONNECT_SRC_EXTRA: CsvList = Field(default_factory=list)
+    # Lesson narration / ambient beds hosted off-origin (e.g. a CDN bucket).
+    CSP_MEDIA_SRC_EXTRA: CsvList = Field(default_factory=list)
+    # Video hosts beyond the YouTube/Vimeo embeds allowed below.
+    CSP_FRAME_SRC_EXTRA: CsvList = Field(default_factory=list)
 
     _csv_fields = field_validator(
         "ALLOWED_ORIGINS",
@@ -76,6 +80,8 @@ class Settings(BaseSettings):
         "CSP_FONT_SRC_EXTRA",
         "CSP_IMG_SRC_EXTRA",
         "CSP_CONNECT_SRC_EXTRA",
+        "CSP_MEDIA_SRC_EXTRA",
+        "CSP_FRAME_SRC_EXTRA",
         mode="before",
     )(_split_csv)
 
@@ -154,8 +160,17 @@ class Settings(BaseSettings):
             "script-src": ["'self'"],
             "style-src": style,
             "font-src": ["'self'", *self.CSP_FONT_SRC_EXTRA],
-            "img-src": ["'self'", "data:", *self.CSP_IMG_SRC_EXTRA],
+            # i.ytimg.com: thumbnails on the "Watch further" video cards.
+            "img-src": ["'self'", "data:", "https://i.ytimg.com", *self.CSP_IMG_SRC_EXTRA],
             "connect-src": ["'self'", *self.CSP_CONNECT_SRC_EXTRA],
+            "media-src": ["'self'", *self.CSP_MEDIA_SRC_EXTRA],
+            # Lesson videos are embeds, never rehosted files.
+            "frame-src": [
+                "https://www.youtube-nocookie.com",
+                "https://www.youtube.com",
+                "https://player.vimeo.com",
+                *self.CSP_FRAME_SRC_EXTRA,
+            ],
             "frame-ancestors": ["'none'"],
             "base-uri": ["'self'"],
             "form-action": ["'self'"],
