@@ -11,6 +11,7 @@ Order matters in two places and both are easy to get wrong:
 """
 
 import logging
+import mimetypes
 from pathlib import Path
 
 from fastapi import FastAPI
@@ -30,6 +31,18 @@ from app.security import install_security_middleware
 logger = logging.getLogger("app")
 
 PUBLIC_DIR = Path(__file__).resolve().parent.parent / "public"
+
+# StaticFiles guesses types from the OS's mime table, which differs by machine:
+# macOS maps .m4a to audio/mp4a-latm, which Safari can refuse to play. Pin the
+# lesson media types so local and Railway serve the same headers.
+for _type, _ext in [
+    ("audio/mpeg", ".mp3"),
+    ("audio/mp4", ".m4a"),
+    ("video/mp4", ".mp4"),
+    ("video/webm", ".webm"),
+    ("text/vtt", ".vtt"),
+]:
+    mimetypes.add_type(_type, _ext)
 
 
 def create_app(config: Settings | None = None) -> FastAPI:

@@ -44,6 +44,14 @@ async def test_static_files_support_range_requests(client):
     assert len(response.content) == 100
 
 
+async def test_lesson_audio_is_served_with_a_playable_type(client):
+    # macOS's own mime table says audio/mp4a-latm for .m4a; app/main.py pins it.
+    for url in active_values("audioUrl"):
+        response = await client.head(f"/{url}")
+        assert response.status_code == 200, url
+        assert response.headers["content-type"] in ("audio/mpeg", "audio/mp4"), url
+
+
 @pytest.mark.parametrize("field", ["audioUrl", "ambientUrl"])
 def test_active_audio_files_exist(field):
     missing = [url for url in active_values(field) if not (PUBLIC_DIR / url).is_file()]
