@@ -16,14 +16,17 @@ export const MODULES = [
         xp: 50,
         // Narration (optional). Add the file and uncomment to turn on the
         // listening view for this lesson; see README "Lesson audio & video".
+        // SCRATCH robot-voice track for testing the player. Swap for the real
+        // .mp3 before merging to main (RELEASE_CHECK=1 pytest enforces it).
+        audioUrl: "audio/lessons/1.1-why-your-mind-matters.scratch.m4a",
         // audioUrl: "audio/lessons/1.1-why-your-mind-matters.mp3",
         // ambientUrl: "audio/ambient/soft-pad.mp3",
-        // Test clip slot: paste the YouTube/Vimeo link into embedUrl. An empty
-        // embedUrl renders nothing, so the lesson looks exactly as before.
+        // TEST clip (Big Buck Bunny, Blender Foundation, CC BY 3.0) to prove the
+        // video slot works. Replace before the beta. An empty embedUrl renders nothing.
         video: {
-          embedUrl: "",
-          title: "Why your mind matters",
-          caption: ""
+          embedUrl: "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+          title: "Test clip",
+          caption: "Test clip: Big Buck Bunny (Blender Foundation, CC BY 3.0)"
         },
         watchFurther: [
           { youtubeId: "FYsoS2D72gI", title: "Limitless Minds: Meet Trevor Moawad", channel: "Russell Wilson" },
