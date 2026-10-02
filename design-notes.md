@@ -103,7 +103,8 @@ conflicts with the design tokens above, the tokens win.
   baked in at both ends, because iOS Safari doesn't allow volume to be changed from code (see
   the README).
 - **Completion:** a light vibration where supported, the ring settling at full, and a calm
-  "Lesson complete" line. There's no confetti or sound.
+  "Listening complete" line. There's no confetti or sound. The lesson itself (and its
+  XP) completes after the quiz, as before.
 
 Sources: [Headspace Engineering — A more accessible audio player](https://medium.com/headspace-engineering/a-more-accessible-audio-player-b9cafc388ff8),
 [Design Critique: Calm (Pratt IxD)](https://ixd.prattsi.org/2018/01/design-critique-calm-ios-app/),

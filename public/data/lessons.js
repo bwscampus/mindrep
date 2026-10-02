@@ -110,6 +110,7 @@ export const MODULES = [
         title: "Neutral Thinking",
         duration: 5,
         xp: 60,
+        // audioUrl: "audio/lessons/1.2-neutral-thinking.mp3",
         watchFurther: [
           { youtubeId: "jEj54Rd8CG4", title: "Limitless Minds: The Power of Your Voice and Neutral Thinking", channel: "Russell Wilson" },
           { youtubeId: "5lCeWtXPKko", title: "How to Break the Addiction to Negative Thoughts & Emotions", channel: "Tom Bilyeu" }
@@ -195,6 +196,7 @@ export const MODULES = [
         title: "The Reset Button",
         duration: 5,
         xp: 70,
+        // audioUrl: "audio/lessons/1.3-the-reset-button.mp3",
         watchFurther: [
           { youtubeId: "o-vIcA2va1U", title: "The Past Is Not Predictive (on Impact Theory)", channel: "Moawad Consulting Group" }
         ],
@@ -301,6 +303,7 @@ export const MODULES = [
         title: "No Excuses, No Limits",
         duration: 6,
         xp: 65,
+        // audioUrl: "audio/lessons/2.1-no-excuses-no-limits.mp3",
         sections: [
           {
             type: "hook",
@@ -382,6 +385,7 @@ export const MODULES = [
         title: "Effort Over Talent",
         duration: 6,
         xp: 65,
+        // audioUrl: "audio/lessons/2.2-effort-over-talent.mp3",
         sections: [
           {
             type: "hook",
@@ -463,6 +467,7 @@ export const MODULES = [
         title: "Own Your Role",
         duration: 6,
         xp: 70,
+        // audioUrl: "audio/lessons/2.3-own-your-role.mp3",
         sections: [
           {
             type: "hook",
@@ -553,6 +558,7 @@ export const MODULES = [
         title: "Your Circle of Control",
         duration: 6,
         xp: 65,
+        // audioUrl: "audio/lessons/3.1-your-circle-of-control.mp3",
         sections: [
           {
             type: "hook",
@@ -634,6 +640,7 @@ export const MODULES = [
         title: "Let Go of the Scoreboard",
         duration: 6,
         xp: 65,
+        // audioUrl: "audio/lessons/3.2-let-go-of-the-scoreboard.mp3",
         sections: [
           {
             type: "hook",
@@ -715,6 +722,7 @@ export const MODULES = [
         title: "The 90-Second Rule",
         duration: 6,
         xp: 70,
+        // audioUrl: "audio/lessons/3.3-the-90-second-rule.mp3",
         sections: [
           {
             type: "hook",

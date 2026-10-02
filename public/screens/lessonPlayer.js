@@ -73,8 +73,8 @@ export function mountLessonPlayer(container, { lesson, moduleTitle, readAlong, c
         </label>` : ''}
 
       <div class="player-complete" id="player-complete" hidden>
-        <div class="player-complete-title">Lesson complete</div>
-        <p class="player-complete-sub">Take a breath. When you're ready, put it into practice.</p>
+        <div class="player-complete-title">Listening complete</div>
+        <p class="player-complete-sub">Nice work. Now put it into practice.</p>
         <button class="btn btn-primary btn-block" id="player-continue" type="button">${continueLabel}</button>
         <button class="btn btn-secondary btn-block" id="player-replay" type="button">Listen again</button>
       </div>
