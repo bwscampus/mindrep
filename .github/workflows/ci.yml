@@ -24,7 +24,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v7
-      - run: uv sync --frozen
+      # --locked (not --frozen): fail if uv.lock is out of date with
+      # pyproject.toml, exactly as Railway's `uv sync --locked` build does.
+      - run: uv sync --locked
 
       # Unit and API tests run on in-memory SQLite (see tests/conftest.py).
       # TEST_POSTGRES_URL enables tests/test_postgres.py: the restricted app

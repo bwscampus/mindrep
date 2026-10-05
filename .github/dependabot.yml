@@ -5,7 +5,17 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
+    # One PR for all Python updates. Separate PRs each regenerate uv.lock
+    # against a different pyproject.toml, and merging them (or clicking
+    # "Update branch") produces a lockfile that matches neither, which
+    # breaks Railway's `uv sync --locked` build.
+    groups:
+      python-dependencies:
+        patterns: ["*"]
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+    groups:
+      github-actions:
+        patterns: ["*"]
