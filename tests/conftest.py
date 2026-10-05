@@ -14,6 +14,7 @@ os.environ.pop("RESEND_API_KEY", None)
 
 import pytest  # noqa: E402
 from httpx import ASGITransport, AsyncClient  # noqa: E402
+from sqlalchemy import event  # noqa: E402
 from sqlalchemy.ext.asyncio import (  # noqa: E402
     async_sessionmaker,
     create_async_engine,
@@ -33,6 +34,13 @@ async def engine():
         connect_args={"check_same_thread": False},
         poolclass=StaticPool,
     )
+
+    # SQLite ignores ON DELETE CASCADE unless asked; Postgres always honours
+    # it. Turn it on so account deletion is tested the way it runs in prod.
+    @event.listens_for(test_engine.sync_engine, "connect")
+    def _enable_foreign_keys(dbapi_connection, _record):
+        dbapi_connection.execute("PRAGMA foreign_keys=ON")
+
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield test_engine
@@ -40,7 +48,7 @@ async def engine():
 
 
 @pytest.fixture
-async def client(engine):
+def app(engine):
     app = create_app()
     session_maker = async_sessionmaker(engine, expire_on_commit=False)
 
@@ -49,7 +57,11 @@ async def client(engine):
             yield session
 
     app.dependency_overrides[get_async_session] = override_get_async_session
+    return app
 
+
+@pytest.fixture
+async def client(app):
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://testserver"
     ) as ac:

@@ -53,3 +53,20 @@ def test_railway_database_url_is_coerced_to_asyncpg():
     settings = Settings(DATABASE_URL="postgresql://u:p@host:5432/db")
     assert settings.DATABASE_URL.startswith("postgresql+asyncpg://")
     assert settings.sync_database_url.startswith("postgresql://")
+
+
+def test_placeholder_email_key_is_flagged():
+    settings = Settings(**{**PROD_ENV, "RESEND_API_KEY": "re_PLACEHOLDER_REPLACE_ME"})
+    assert any("RESEND_API_KEY" in w for w in settings.startup_warnings())
+    assert Settings(**PROD_ENV).startup_warnings() == []
+
+
+async def test_well_formed_request_id_is_echoed(client):
+    response = await client.get("/api/health", headers={"X-Request-ID": "abc-123"})
+    assert response.headers["X-Request-ID"] == "abc-123"
+
+
+async def test_malformed_request_id_is_replaced(client):
+    supplied = "forged entry; level=CRITICAL"
+    response = await client.get("/api/health", headers={"X-Request-ID": supplied})
+    assert response.headers["X-Request-ID"] != supplied

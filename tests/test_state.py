@@ -76,3 +76,12 @@ async def test_one_athletes_progress_is_not_visible_to_another(
     body = (await client.get("/api/state")).json()
     assert body["profile"] is None
     assert body["progress"] == {}
+
+
+async def test_oversized_state_is_rejected(client, credentials, registered):
+    await login(client, credentials)
+    huge = {"journalEntries": ["x" * 1024] * 300}  # ~300 KB
+    response = await client.put("/api/state", json={"profile": None, "progress": huge})
+    assert response.status_code == 422
+    stored = await client.get("/api/state")
+    assert stored.json()["progress"] == {}

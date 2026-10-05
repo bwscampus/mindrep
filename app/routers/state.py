@@ -5,15 +5,17 @@ writes the whole thing back on a debounce, so these are the only two routes
 the app needs to be fully synced.
 """
 
+import json
 from typing import Any
 
 from fastapi import APIRouter, Depends
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.models import User
 from app.auth.router import current_active_user
+from app.config import settings
 from app.db import get_async_session
 from app.models import UserState
 
@@ -23,6 +25,24 @@ router = APIRouter()
 class StatePayload(BaseModel):
     profile: dict[str, Any] | None = None
     progress: dict[str, Any] = Field(default_factory=dict)
+
+
+class StateWrite(StatePayload):
+    """Same shape, with a size cap so one account can't fill the database."""
+
+    @model_validator(mode="after")
+    def _not_too_large(self) -> "StateWrite":
+        size = len(
+            json.dumps(
+                {"profile": self.profile, "progress": self.progress},
+                separators=(",", ":"),
+            ).encode()
+        )
+        if size > settings.MAX_STATE_BYTES:
+            raise ValueError(
+                f"State is {size} bytes; the limit is {settings.MAX_STATE_BYTES}."
+            )
+        return self
 
 
 class StateResponse(StatePayload):
@@ -53,7 +73,7 @@ async def read_state(
 
 @router.put("/state", response_model=StateResponse)
 async def write_state(
-    payload: StatePayload,
+    payload: StateWrite,
     user: User = Depends(current_active_user),
     session: AsyncSession = Depends(get_async_session),
 ) -> StateResponse:

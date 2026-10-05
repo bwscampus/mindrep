@@ -35,6 +35,8 @@ PUBLIC_DIR = Path(__file__).resolve().parent.parent / "public"
 def create_app(config: Settings | None = None) -> FastAPI:
     config = config or settings
     configure_logging()
+    for warning in config.startup_warnings():
+        logger.warning("Config: %s", warning)
 
     app = FastAPI(
         title=config.APP_NAME,
