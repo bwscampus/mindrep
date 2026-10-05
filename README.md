@@ -102,7 +102,7 @@ railway variables --set ENVIRONMENT=production \
   --set 'DATABASE_URL=${{Postgres.DATABASE_URL}}' \
   --set RESEND_API_KEY=re_xxx --set EMAIL_FROM=noreply@yourdomain.com \
   --set PUBLIC_BASE_URL=https://<your-app>.up.railway.app \
-  --set ALLOWED_HOSTS=<your-app>.up.railway.app \
+  --set ALLOWED_HOSTS=<your-app>.up.railway.app,healthcheck.railway.app \
   --set CSP_ALLOW_INLINE_STYLES=true \
   --set CSP_STYLE_SRC_EXTRA=https://fonts.googleapis.com \
   --set CSP_FONT_SRC_EXTRA=https://fonts.gstatic.com
@@ -115,5 +115,35 @@ deploy fails loudly and the previous version keeps serving.
 
 The three CSP variables are required: the app uses inline `style` attributes
 and Google Fonts. Without them the deployed app renders unstyled.
+
+### Database roles
+
+Migrations run as the database owner; the app is meant to run as
+`app_rw_login`, a role that can read and write the app's tables but cannot
+change the schema, create roles, or bypass row-level security. After every
+migration, `python -m app.db_roles` (in the start command) creates or updates
+that role. It only creates the login role, and (re)sets its password, when
+`APP_DB_PASSWORD` is set.
+
+> **Not yet applied in production.** Production still connects as `postgres`.
+> To switch over, after this code is deployed:
+
+1. Add a **sealed** variable on the `mindrep` service:
+   `APP_DB_PASSWORD=$(python3 -c 'import secrets; print(secrets.token_urlsafe(32))')`.
+2. Point migrations at the owner and the app at the restricted role:
+   ```bash
+   railway variables \
+     --set 'MIGRATION_DATABASE_URL=${{Postgres.DATABASE_URL}}' \
+     --set 'DATABASE_URL=postgresql://app_rw_login:${{APP_DB_PASSWORD}}@${{Postgres.PGHOST}}:${{Postgres.PGPORT}}/${{Postgres.PGDATABASE}}'
+   ```
+3. The redeploy runs migrations as the owner, creates `app_rw_login`, and
+   starts the app as it. Check `/api/health` returns 200, sign in, and change
+   something (e.g. complete a lesson) to exercise a write.
+
+**Rollback:** set `DATABASE_URL` back to `${{Postgres.DATABASE_URL}}` and
+redeploy. The role can stay; it's harmless unused.
+
+To rotate the password, change `APP_DB_PASSWORD` and redeploy.
+`tests/test_postgres.py` checks the grants against a real Postgres (CI runs it).
 
 See `ROADMAP.md` for what's built and what's next.

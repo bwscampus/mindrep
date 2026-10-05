@@ -12,6 +12,15 @@ from pydantic import Field, computed_field, field_validator, model_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 INSECURE_SECRET = "dev-insecure-change-me"
+
+
+def async_driver_url(value):
+    """`postgresql://` -> `postgresql+asyncpg://`; anything else unchanged."""
+    if isinstance(value, str):
+        for prefix in ("postgresql://", "postgres://"):
+            if value.startswith(prefix):
+                return "postgresql+asyncpg://" + value[len(prefix):]
+    return value
 PLACEHOLDER_RESEND_PREFIX = "re_PLACEHOLDER"
 
 
@@ -93,11 +102,7 @@ class Settings(BaseSettings):
         requires an async driver`, which reads like a code bug rather than a
         URL scheme problem. Fix it here, once.
         """
-        if isinstance(value, str):
-            for prefix in ("postgresql://", "postgres://"):
-                if value.startswith(prefix):
-                    return "postgresql+asyncpg://" + value[len(prefix):]
-        return value
+        return async_driver_url(value)
 
     @computed_field
     @property

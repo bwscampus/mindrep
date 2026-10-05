@@ -11,6 +11,7 @@ from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
 from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.auth.backend import hash_token
 from app.auth.models import AccessToken, User
 from app.auth.schemas import UserCreate, UserUpdate
 from app.config import settings
@@ -115,7 +116,10 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
             return
         statement = delete(AccessToken).where(AccessToken.user_id == user.id)
         if keep_token:
-            statement = statement.where(AccessToken.token != keep_token)
+            # The table stores hashes; keep_token is the raw cookie value.
+            statement = statement.where(
+                AccessToken.token != hash_token(keep_token)
+            )
         await session.execute(statement)
         await session.commit()
 
