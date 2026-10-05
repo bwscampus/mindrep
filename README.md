@@ -147,3 +147,14 @@ To rotate the password, change `APP_DB_PASSWORD` and redeploy.
 `tests/test_postgres.py` checks the grants against a real Postgres (CI runs it).
 
 See `ROADMAP.md` for what's built and what's next.
+
+## License
+
+MindRep is source-available under the [PolyForm Noncommercial License 1.0.0](LICENSE.md).
+Copyright 2026 The MindRep founders.
+
+- **Noncommercial use is free.** Personal study, learning, hobby projects, schools, and nonprofits may
+  use, copy, modify, and share the code, as long as they include the license and its `Required Notice:` line.
+- **Commercial use is reserved to the founders,** who keep all rights to the code and the product. To ask
+  about commercial use, open an issue on this repository.
+- Third-party libraries and assets keep their own licenses.
