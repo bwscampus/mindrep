@@ -22,7 +22,7 @@ jobs:
           --health-cmd pg_isready --health-interval 5s
           --health-timeout 5s --health-retries 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: astral-sh/setup-uv@v7
       # --locked (not --frozen): fail if uv.lock is out of date with
       # pyproject.toml, exactly as Railway's `uv sync --locked` build does.
