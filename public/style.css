@@ -968,3 +968,10 @@ body {
 .uppercase{text-transform:uppercase;letter-spacing:.06em}
 .font-display{font-family:var(--font-display)}
 .divider{height:1px;background:var(--border);margin:16px 0}
+
+/* Privacy policy placeholder page (public/privacy.html) */
+.privacy-draft { max-width: 560px; margin: 40px auto; padding: 28px 24px; font-family: var(--font-body); line-height: 1.6; color: var(--text); }
+.privacy-draft h1 { font-family: var(--font-display); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 12px; }
+.privacy-draft p { margin-bottom: 12px; color: var(--muted2); }
+.privacy-draft a { color: var(--teal); }
+.privacy-draft-banner { font-family: var(--font-display); font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--coral) !important; border: 1px solid var(--coral); border-radius: 8px; padding: 8px 12px; }

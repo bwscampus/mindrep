@@ -12,6 +12,8 @@ import { renderAchievements, attachAchievementsEvents } from './screens/achievem
 import { getUser, getProgress, saveProgress, updateStreak, hydrate, onSyncError } from './utils/storage.js';
 import { api } from './utils/api.js';
 import { renderAuth, readResetTokenFromUrl, clearResetTokenFromUrl } from './screens/auth.js';
+import { setAccount } from './utils/admin.js';
+import { escapeHtml } from './utils/escape.js';
 
 // Clean line icons (currentColor strokes) for the bottom nav — no emoji,
 // no text labels. Active state is shown with a small dot underneath instead.
@@ -136,6 +138,7 @@ async function startSession() {
   clearResetTokenFromUrl();
 
   try {
+    setAccount(await api.me());
     await hydrate();
   } catch (error) {
     renderConnectionError();
@@ -232,7 +235,7 @@ function fireGameReminder(user) {
     <div style="display:flex;align-items:flex-start;gap:12px">
       <div style="font-size:1.6rem;flex-shrink:0">🎯</div>
       <div style="flex:1">
-        <div style="font-weight:900;font-size:1rem;text-transform:uppercase;letter-spacing:.04em;color:#F1F5F9">Game Day, ${user?.name || 'Athlete'}!</div>
+        <div style="font-weight:900;font-size:1rem;text-transform:uppercase;letter-spacing:.04em;color:#F1F5F9">Game Day, ${escapeHtml(user?.name || 'Athlete')}!</div>
         <div style="font-size:.82rem;color:rgba(241,245,249,.7);margin-top:2px;font-family:'Inter',sans-serif;line-height:1.4">Open your 3-min pre-game mental warm-up.</div>
       </div>
       <button id="reminder-banner-close" style="background:none;border:none;color:#64748B;font-size:1.1rem;cursor:pointer;padding:0 4px;flex-shrink:0">✕</button>

@@ -1,20 +1,34 @@
-// utils/admin.js — Admin mode: secret access for the app owner
+// utils/admin.js — Demo mode: preview every module for testing and demos.
+//
+// Only accounts the server marks `is_superuser` can turn it on. It used to be
+// a passphrase in this file, but the repo is public, so anyone could read it.
+// Grant the flag in the database (UPDATE users SET is_superuser = true ...);
+// users cannot set it on themselves.
+//
+// This only changes what the browser shows. Anything that must really be paid
+// for has to be enforced by the server (Production Standard FE-3).
 
 import { storage } from './storage.js';
 
-// Secret passphrase — change this to whatever you want
-const ADMIN_PASSPHRASE = 'mindrepGOD2026';
+let accountIsSuperuser = false;
 
-export function isAdmin() {
-  return storage.get('admin_mode', false) === true;
+/** Record the signed-in account (from GET /api/users/me). */
+export function setAccount(me) {
+  accountIsSuperuser = me?.is_superuser === true;
 }
 
-export function activateAdmin(passphrase) {
-  if (passphrase.trim() === ADMIN_PASSPHRASE) {
-    storage.set('admin_mode', true);
-    return true;
-  }
-  return false;
+export function canUseDemoMode() {
+  return accountIsSuperuser;
+}
+
+export function isAdmin() {
+  return accountIsSuperuser && storage.get('admin_mode', false) === true;
+}
+
+export function activateAdmin() {
+  if (!accountIsSuperuser) return false;
+  storage.set('admin_mode', true);
+  return true;
 }
 
 export function deactivateAdmin() {

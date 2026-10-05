@@ -67,8 +67,9 @@ infrastructure:
   as a paid differentiator needs a real model integration.
 - **No real payments.** The waitlist modal collects an email in `localStorage`; there's
   no Stripe/payment processor wired up.
-- **Demo mode isn't security, and gating is still client-side.** The backend now
-  exists to make module gating real, but it doesn't do it yet: lesson content still
+- **Gating is still client-side.** Demo mode is now limited to accounts with
+  `is_superuser` (the old passphrase was public and should be considered burned),
+  but module gating itself still isn't real: lesson content still
   ships to every browser in `data/lessons.js`, and `locked` flags are enforced in
   client code. Moving paid content behind an authenticated endpoint is the remaining
   work before MindRep+ can charge anyone.

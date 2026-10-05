@@ -4,6 +4,7 @@ import { COACH_RESPONSES } from '../data/lessons.js';
 import { getProgress, saveProgress, getCoachChat, saveCoachChat } from '../utils/storage.js';
 import { showToast, fireConfetti } from '../utils/gamification.js';
 import { coachAvatar } from '../utils/illustrations.js';
+import { escapeHtml } from '../utils/escape.js';
 
 let breathInterval = null;
 let breathPhase = 'ready';
@@ -271,8 +272,8 @@ function renderCoachTab() {
         <!-- Render saved history -->
         <div id="chat-messages" style="margin-bottom:12px;max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:2px">
           ${history.map(m => m.role === 'user'
-            ? `<div class="user-bubble">${m.text}</div>`
-            : `<div class="coach-bubble">${m.text}</div>`
+            ? `<div class="user-bubble">${escapeHtml(m.text)}</div>`
+            : `<div class="coach-bubble">${escapeHtml(m.text)}</div>`
           ).join('')}
         </div>
       `}

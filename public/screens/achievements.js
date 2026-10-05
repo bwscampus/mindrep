@@ -2,11 +2,12 @@
 
 import { BADGES } from '../data/lessons.js';
 import { storage, getProgress, saveProgress, getUser, getXPForLevel, LEVEL_NAMES, resetAll } from '../utils/storage.js';
-import { signOut } from '../utils/session.js';
-import { isAdmin, activateAdmin, deactivateAdmin, applyAdminUnlock } from '../utils/admin.js';
+import { signOut, deleteAccount } from '../utils/session.js';
+import { isAdmin, canUseDemoMode } from '../utils/admin.js';
 import { showToast, fireConfetti } from '../utils/gamification.js';
 import { drawMindGlyph } from '../utils/illustrations.js';
 import { isLockedIn } from '../utils/lockedIn.js';
+import { escapeHtml } from '../utils/escape.js';
 
 export function renderAchievements(navigate) {
   const progress    = getProgress();
@@ -53,7 +54,7 @@ export function renderAchievements(navigate) {
             <span class="lv-label">Level</span>
           </div>
         </div>
-        <h1 style="font-family:var(--font-display);font-size:1.8rem;font-weight:900;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">${user?.name || 'Athlete'}</h1>
+        <h1 style="font-family:var(--font-display);font-size:1.8rem;font-weight:900;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">${escapeHtml(user?.name || 'Athlete')}</h1>
         <div style="color:var(--gold);font-family:var(--font-display);font-weight:700;font-size:1rem;letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px">${levelInfo.label}</div>
         <div style="font-size:.8rem;color:var(--muted);margin-bottom:8px;font-family:var(--font-body)">${xp} / ${levelInfo.next} XP to Level ${level + 1}</div>
         <div class="xp-bar-wrap">
@@ -190,13 +191,13 @@ export function renderAchievements(navigate) {
         </label>
       </div>
 
-      <!-- Admin trigger -->
-      <div id="admin-trigger" style="text-align:center;cursor:pointer;padding:16px 0;opacity:.12;font-size:.7rem;letter-spacing:.05em">⚙</div>
+      <!-- Admin trigger (staff accounts only) -->
+      ${canUseDemoMode() ? `<div id="admin-trigger" style="text-align:center;cursor:pointer;padding:16px 0;opacity:.12;font-size:.7rem;letter-spacing:.05em">⚙</div>` : ''}
 
       <div id="admin-panel" style="display:none">
         <div class="glass" style="padding:24px;margin-bottom:16px;border-color:${admin ? 'rgba(94,234,212,.4)' : 'rgba(255,255,255,.1)'}">
           <div style="font-family:var(--font-display);font-weight:900;font-size:1rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">${admin ? '⚡ Demo Mode — Active' : '🔒 Demo Mode'}</div>
-          <div style="font-size:.8rem;color:var(--muted);margin-bottom:16px;font-family:var(--font-body)">${admin ? 'Full access to all features and content, for testing/demo purposes.' : 'Enter the demo passphrase to preview all content. This is a testing shortcut, not real account security.'}</div>
+          <div style="font-size:.8rem;color:var(--muted);margin-bottom:16px;font-family:var(--font-body)">${admin ? 'Full access to all features and content, for testing/demo purposes.' : 'Preview all content on this device. Available to staff accounts only.'}</div>
           ${admin ? `
             <div style="display:flex;flex-direction:column;gap:10px">
               <div style="font-size:.85rem;color:var(--muted);background:rgba(94,234,212,.07);border:1px solid rgba(94,234,212,.2);border-radius:8px;padding:12px 14px;font-family:var(--font-body)">
@@ -208,18 +209,25 @@ export function renderAchievements(navigate) {
               <button class="btn btn-secondary btn-sm" id="admin-deactivate">Deactivate Demo Mode</button>
             </div>
           ` : `
-            <div style="display:flex;gap:8px">
-              <input type="password" id="admin-pass" placeholder="Enter passphrase..."
-                style="flex:1;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:12px 14px;color:var(--text);font-size:.9rem;transition:border-color .2s"/>
-              <button class="btn btn-primary btn-sm" id="admin-submit" style="flex-shrink:0">Unlock</button>
-            </div>
-            <div id="admin-error" style="color:var(--coral);font-size:.8rem;margin-top:8px;display:none;font-family:var(--font-body)">Incorrect passphrase. Try again.</div>
+            <button class="btn btn-primary btn-sm" id="admin-submit" style="width:100%">Enable Demo Mode</button>
+            <div id="admin-error" style="color:var(--coral);font-size:.8rem;margin-top:8px;display:none;font-family:var(--font-body)">Demo mode is only available to staff accounts.</div>
           `}
         </div>
       </div>
 
       ${admin ? `<button class="btn btn-secondary btn-sm" id="reset-progress" style="opacity:.5;margin-bottom:8px;width:100%">🗑 Reset Progress</button>` : ''}
       <button class="btn btn-secondary btn-sm" id="sign-out" style="width:100%;margin-bottom:8px">Sign Out</button>
+      <button class="btn btn-secondary btn-sm" id="delete-account-toggle" style="width:100%;margin-bottom:8px;opacity:.6">Delete Account</button>
+      <div id="delete-account-panel" class="glass" style="display:none;padding:20px;margin-bottom:8px;border-color:rgba(248,113,113,.4)">
+        <div style="font-family:var(--font-display);font-weight:900;font-size:1rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Delete your account</div>
+        <p style="font-size:.8rem;color:var(--muted);margin-bottom:12px;font-family:var(--font-body);line-height:1.5">This permanently erases your profile, progress, journal, and coach chat. It can't be undone.</p>
+        <label for="delete-account-password" style="display:block;font-size:.8rem;color:var(--muted2);margin-bottom:6px;font-family:var(--font-body)">Enter your password to confirm</label>
+        <input type="password" id="delete-account-password" autocomplete="current-password"
+          style="width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:12px 14px;color:var(--text);font-size:.9rem;margin-bottom:10px"/>
+        <button class="btn btn-primary btn-sm" id="delete-account-confirm" style="width:100%;background:var(--coral)">Permanently Delete</button>
+        <div id="delete-account-error" role="alert" style="color:var(--coral);font-size:.8rem;margin-top:8px;display:none;font-family:var(--font-body)"></div>
+      </div>
+      <a href="/privacy.html" target="_blank" rel="noopener" style="display:block;text-align:center;font-size:.75rem;color:var(--muted);margin-top:8px">Privacy</a>
       <div style="height:16px"></div>
     </div>
 
@@ -241,17 +249,17 @@ function renderToolbox(progress) {
       </div>
       <div style="margin-bottom:14px">
         <div class="reflection-question" style="text-transform:none;letter-spacing:0;font-size:.8rem">Neutral Reset Phrase</div>
-        <input class="reflection-textarea" id="toolbox-neutralPhrase" type="text" placeholder="e.g. Next play." value="${(progress.neutralPhrase || '').replace(/"/g, '&quot;')}"
+        <input class="reflection-textarea" id="toolbox-neutralPhrase" type="text" placeholder="e.g. Next play." value="${escapeHtml(progress.neutralPhrase || '')}"
           style="height:auto;min-height:0;padding:12px 14px" />
       </div>
       <div style="margin-bottom:14px">
         <div class="reflection-question" style="text-transform:none;letter-spacing:0;font-size:.8rem">Reset Routine</div>
-        <input class="reflection-textarea" id="toolbox-resetRoutine" type="text" placeholder="Not set yet — try Lesson 1.3" value="${(progress.resetRoutine || '').replace(/"/g, '&quot;')}"
+        <input class="reflection-textarea" id="toolbox-resetRoutine" type="text" placeholder="Not set yet — try Lesson 1.3" value="${escapeHtml(progress.resetRoutine || '')}"
           style="height:auto;min-height:0;padding:12px 14px" />
       </div>
       <div style="margin-bottom:16px">
         <div class="reflection-question" style="text-transform:none;letter-spacing:0;font-size:.8rem">Circle of Control</div>
-        <textarea class="reflection-textarea" id="toolbox-controlList" placeholder="Not set yet — try Lesson 3.1" rows="2">${progress.controlList || ''}</textarea>
+        <textarea class="reflection-textarea" id="toolbox-controlList" placeholder="Not set yet — try Lesson 3.1" rows="2">${escapeHtml(progress.controlList || '')}</textarea>
       </div>
       <button class="btn btn-primary btn-sm btn-block" id="toolbox-save">Save Toolbox</button>
     </div>
@@ -306,6 +314,34 @@ export function attachAchievementsEvents(navigate) {
     await signOut();
   });
 
+  document.getElementById('delete-account-toggle')?.addEventListener('click', () => {
+    const panel = document.getElementById('delete-account-panel');
+    if (panel) panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+  });
+
+  document.getElementById('delete-account-confirm')?.addEventListener('click', async () => {
+    const button = document.getElementById('delete-account-confirm');
+    const error = document.getElementById('delete-account-error');
+    const password = document.getElementById('delete-account-password')?.value || '';
+    if (!password) {
+      error.textContent = 'Enter your password to confirm.';
+      error.style.display = 'block';
+      return;
+    }
+    button.disabled = true;
+    try {
+      await deleteAccount(password);
+    } catch (e) {
+      error.textContent = e?.status === 400
+        ? 'That password is incorrect.'
+        : e?.status === 429
+          ? 'Too many attempts. Try again later.'
+          : 'Could not delete your account. Try again.';
+      error.style.display = 'block';
+      button.disabled = false;
+    }
+  });
+
   // Admin trigger (5 taps)
   let tapCount = 0, tapTimer = null;
   document.getElementById('admin-trigger')?.addEventListener('click', () => {
@@ -321,24 +357,20 @@ export function attachAchievementsEvents(navigate) {
 
   // Admin submit
   const tryActivate = () => {
-    const val = document.getElementById('admin-pass')?.value || '';
     import('../utils/admin.js').then(({ activateAdmin, applyAdminUnlock }) => {
       import('../utils/storage.js').then(({ getProgress, saveProgress }) => {
-        if (activateAdmin(val)) {
+        if (activateAdmin()) {
           const progress = getProgress();
           saveProgress(applyAdminUnlock(progress));
           navigate('achievements');
         } else {
           const err = document.getElementById('admin-error');
-          const inp = document.getElementById('admin-pass');
           if (err) err.style.display = 'block';
-          if (inp) inp.style.borderColor = 'var(--coral)';
         }
       });
     });
   };
   document.getElementById('admin-submit')?.addEventListener('click', tryActivate);
-  document.getElementById('admin-pass')?.addEventListener('keydown', e => { if (e.key === 'Enter') tryActivate(); });
 
   // Admin deactivate
   document.getElementById('admin-deactivate')?.addEventListener('click', () => {

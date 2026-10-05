@@ -6,6 +6,7 @@ import { moduleIcon } from '../utils/illustrations.js';
 import { isLockedIn } from '../utils/lockedIn.js';
 import { getTodayRep } from '../data/dailyReps.js';
 import { isWeeklyCheckinDue } from '../utils/weekly.js';
+import { escapeHtml } from '../utils/escape.js';
 
 // Simple line icons for the practice/journal tiles — same visual language
 // as the bottom nav (currentColor strokes, no emoji).
@@ -55,7 +56,7 @@ export function renderHome(navigate) {
 
       <!-- Personalized greeting header -->
       <div class="app-header">
-        <div class="app-greeting">Hey, ${user?.name || 'Athlete'}! ${sport.emoji}</div>
+        <div class="app-greeting">Hey, ${escapeHtml(user?.name || 'Athlete')}! ${sport.emoji}</div>
         <div class="app-date">${dateStr}</div>
       </div>
 
@@ -63,7 +64,7 @@ export function renderHome(navigate) {
       <div class="featured-card" id="featured-card">
         ${lockedIn ? (repDoneToday ? `
           <div class="fc-eyebrow">✅ Today's Rep Complete</div>
-          <div class="fc-title">Nice work, ${user?.name || 'Athlete'}!</div>
+          <div class="fc-title">Nice work, ${escapeHtml(user?.name || 'Athlete')}!</div>
           <div class="fc-sub">Come back tomorrow for a new rep. Your Toolbox is always open below.</div>
         ` : `
           <div class="fc-eyebrow">🎯 Today's Rep · ${todayRep.skill}</div>

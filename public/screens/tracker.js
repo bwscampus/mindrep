@@ -5,6 +5,7 @@ import { showToast, fireConfetti } from '../utils/gamification.js';
 import { getSportTerms } from '../utils/sports.js';
 import { isLockedIn } from '../utils/lockedIn.js';
 import { isWeeklyCheckinDue } from '../utils/weekly.js';
+import { escapeHtml } from '../utils/escape.js';
 
 let activeTab = 'journal';
 
@@ -164,18 +165,18 @@ function renderHistoryTab(progress, sportTerms, navigate) {
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
             <div>
               <div style="font-family:var(--font-display);font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)">${entry.type === 'practice' ? '🏋️ Practice' : `${sportTerms.emoji} ${sportTerms.event}`} · ${new Date(entry.date).toLocaleDateString('en-US',{month:'short',day:'numeric'})}</div>
-              <div style="font-family:var(--font-display);font-weight:700;font-size:.95rem;text-transform:uppercase;margin-top:2px">${entry.qGood ? entry.qGood.slice(0,38) + (entry.qGood.length > 38 ? '…' : '') : 'Session Entry'}</div>
+              <div style="font-family:var(--font-display);font-weight:700;font-size:.95rem;text-transform:uppercase;margin-top:2px">${entry.qGood ? escapeHtml(entry.qGood.slice(0,38)) + (entry.qGood.length > 38 ? '…' : '') : 'Session Entry'}</div>
             </div>
             <div style="text-align:right;flex-shrink:0">
-              <div style="font-family:var(--font-display);font-size:1.6rem;font-weight:900;color:var(--teal);line-height:1">${entry.performance}</div>
+              <div style="font-family:var(--font-display);font-size:1.6rem;font-weight:900;color:var(--teal);line-height:1">${escapeHtml(entry.performance)}</div>
               <div style="font-size:.65rem;color:var(--muted);font-family:var(--font-display);font-weight:700;letter-spacing:.08em;text-transform:uppercase">/10 Perf</div>
             </div>
           </div>
           <div style="display:flex;gap:8px">
-            <div style="background:rgba(168,175,189,.15);border-radius:50px;padding:3px 10px;font-family:var(--font-display);font-size:.72rem;font-weight:700;color:var(--purple)">Conf ${entry.confidence}/5</div>
+            <div style="background:rgba(168,175,189,.15);border-radius:50px;padding:3px 10px;font-family:var(--font-display);font-size:.72rem;font-weight:700;color:var(--purple)">Conf ${escapeHtml(entry.confidence)}/5</div>
             <div style="background:rgba(94,234,212,.1);border-radius:50px;padding:3px 10px;font-family:var(--font-display);font-size:.72rem;font-weight:700;color:var(--teal)">Focus ${'★'.repeat(Math.round(entry.mental||3))}${'☆'.repeat(5-Math.round(entry.mental||3))}</div>
           </div>
-          ${entry.qNext ? `<div style="margin-top:8px;font-size:.78rem;color:var(--muted);border-top:1px solid var(--border);padding-top:8px;font-family:var(--font-body)">Next: ${entry.qNext}</div>` : ''}
+          ${entry.qNext ? `<div style="margin-top:8px;font-size:.78rem;color:var(--muted);border-top:1px solid var(--border);padding-top:8px;font-family:var(--font-body)">Next: ${escapeHtml(entry.qNext)}</div>` : ''}
         </div>
       `).join('')}
     </div>
