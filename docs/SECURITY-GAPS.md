@@ -2,7 +2,7 @@
 
 Audit date: 2026-10-05. Fixes on branch `security/production-standard`; database hardening
 (DB-6, DB-8) on branch `security/db-hardening`, which builds on it.
-Rule IDs refer to the class [Production Standard](../.claude/skills/production-standard/references/standard.md).
+Rule IDs refer to the class [Production Standard](PRODUCTION_STANDARD.md).
 
 **Status key:** **Fixed** = fixed on this branch · **Open** = student task · **Owner** = a
 setting or decision for the teacher/school, not code.
