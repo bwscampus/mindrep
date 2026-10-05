@@ -65,3 +65,24 @@ async def test_stored_hash_is_not_a_usable_cookie(
     # What a database reader would see cannot be replayed as a session.
     client.cookies.set(settings.SESSION_COOKIE_NAME, stored)
     assert (await client.get("/api/users/me")).status_code == 401
+
+
+async def test_login_purges_expired_sessions(client, engine, credentials, registered):
+    from datetime import datetime, timedelta, timezone
+
+    from app.auth.models import User
+
+    async with async_sessionmaker(engine)() as session:
+        user = await session.scalar(select(User))
+        old = datetime.now(timezone.utc) - timedelta(
+            seconds=settings.SESSION_LIFETIME_SECONDS + 60
+        )
+        session.add(AccessToken(token="expired-" + "x" * 35, user_id=user.id, created_at=old))
+        await session.commit()
+    assert any(t.startswith("expired-") for t in await stored_tokens(engine))
+
+    cookie = await login(client, credentials)
+
+    tokens = await stored_tokens(engine)
+    assert not any(t.startswith("expired-") for t in tokens)
+    assert hash_token(cookie) in tokens  # the fresh session survives

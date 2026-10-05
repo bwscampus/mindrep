@@ -39,15 +39,19 @@ proving it. The real gaps were around **minors' data and consent**, **account se
 | 18 | FE-4 | Low | `public/style.css:75-76`, `public/screens/auth.js:60` | `outline: none` with no `:focus-visible` replacement; inputs use placeholders instead of `<label>`. | **Open** |
 | 19 | FE-5 | Low | `public/screens/*.js` | About 490 inline `style=` attributes, which force `'unsafe-inline'` in the style CSP. Several color tokens are aliases of the same value. | **Open**: move to classes in `style.css`. |
 | 20 | AUTH-2 | Low | fastapi-users `is_verified` | Emails are never verified, so anyone can sign up with someone else's address. | **Open** |
-| 21 | API-6 | Low | `/api/auth/login` | Login CSRF is possible (form-encoded POST with SameSite=Lax), so a site could sign a victim into the attacker's account. | **Open**: check `Origin` on login. |
+| 21 | API-6 | Low | `app/security.py` (`OriginCheckMiddleware`) | Login CSRF was possible (form-encoded POST with SameSite=Lax), so a site could sign a victim into the attacker's account. | **Fixed in `security/hardening-round-1`**: unsafe requests under `/api/` must carry an `Origin` (or `Referer`) naming this site; form-type bodies with neither are refused. 403 otherwise. |
 | 22 | DB-6 | Medium | `app/db_roles.py` | The app connected as the `postgres` superuser, so a SQL injection or leaked app credential could drop tables, create roles, or bypass any row-level security. | **Fixed in `security/db-hardening`**: the app runs as `app_rw_login` (DML only, no DDL, no superuser/BYPASSRLS), created on every deploy by `python -m app.db_roles`. **Production cut-over pending**: see README → Database roles. |
 | 23 | DB-4 | Low | `app/db.py:19` | No explicit TLS. Fine on Railway's private network; confirm `DATABASE_URL` uses `*.railway.internal`. | **Owner**: confirm |
-| 24 | n/a | Low | `access_tokens` table | Expired session rows are never cleaned up. | **Open** (rows now hold only hashes, see #27, so the risk is clutter, not credentials) |
+| 24 | n/a | Low | `app/auth/users.py` (`on_after_login`) | Expired session rows were never cleaned up. | **Fixed in `security/hardening-round-1`**: each login deletes `access_tokens` rows older than `SESSION_LIFETIME_SECONDS`. |
 | 25 | OPS-3, OPS-4 | n/a | GitHub settings | Secret scanning, push protection, and branch protection requiring CI. | **Owner** |
 | 26 | OPS-1 | n/a | Railway settings | Turn on "Wait for CI" so a red build never deploys. | **Owner** |
 | 27 | DB-8 | High | `app/auth/backend.py` | `access_tokens.token` stored the raw session token, the same value as the cookie. Anyone who could read the database or a backup could sign in as any athlete. | **Fixed in `security/db-hardening`**: only `base64url(sha256(token))` is stored; migration `0003` hashes existing rows in place, so nobody is signed out. |
 | 28 | PRIV-3, DB-7 | Medium | `user_state.progress` | Minors' journal entries, coach-chat messages, mental-state ratings and reflections are plain JSONB. Railway encrypts the disk (AES-256), but anyone with database or backup access can read them. | **Open** (decided 2026-10-05: deferred). Option: encrypt the `progress` blob in the app with a key in Railway variables. It is never queried server-side, so this is cheap. The key must be backed up: lose it and the data is gone. |
 | 29 | n/a | Low | Postgres | No row-level security. Isolation between athletes is enforced by the app (`state.py` always filters by the session's `user.id`, and `tests/test_state.py` proves it). | **Open** (decided 2026-10-05: deferred). RLS only means something now that the app no longer connects as a superuser (#22). Next step would be a policy on `user_state` keyed on a per-request `SET app.user_id`. |
+
+> **Round 1 hardening (2026-10-05)** closed #21 and #24. Still open, out of that round: email
+> verification (#20), focus styles and labels (#18), inline styles (#19), server-side paywall (#12),
+> Sentry/uptime (#13), field-level encryption (#28), and RLS (#29).
 
 ## How to grant demo mode
 
