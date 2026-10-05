@@ -84,7 +84,7 @@ email addresses have accounts.
 
 ## Deploying
 
-Live at **https://mindrep-production-ad66.up.railway.app**
+Live at **https://mindrep.up.railway.app**
 
 ```bash
 railway up      # from the repo root, once linked
