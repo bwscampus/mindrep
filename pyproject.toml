@@ -5,13 +5,13 @@ description = "FastAPI backend with cookie-session auth, Postgres, and Railway d
 requires-python = ">=3.13,<3.14"
 dependencies = [
     "fastapi>=0.115",
-    "uvicorn[standard]>=0.32",
+    "uvicorn[standard]>=0.54.0",
     "fastapi-users[sqlalchemy]>=15.0",
     "sqlalchemy[asyncio]>=2.0",
     "asyncpg>=0.30",
     "alembic>=1.14",
     "pydantic-settings>=2.6",
-    "resend>=2.4",
+    "resend>=2.49.0",
     "pwdlib[argon2]>=0.2.1",
     "python-multipart>=0.0.20",
 ]
