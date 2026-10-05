@@ -5,6 +5,7 @@ import { getProgress, storage } from '../utils/storage.js';
 import { isAdmin } from '../utils/admin.js';
 import { showToast } from '../utils/gamification.js';
 import { moduleIcon } from '../utils/illustrations.js';
+import { escapeHtml } from '../utils/escape.js';
 
 // Modules no longer get a distinct rainbow color each — the design system
 // uses one accent color (mint/teal) reserved for progress/active state, with
@@ -182,7 +183,7 @@ function showPremiumWaitlist() {
     <div style="background:var(--bg2);border:1px solid var(--border-bright);border-top-left-radius:16px;border-top-right-radius:16px;padding:28px 24px;width:100%;max-width:430px;margin:0 auto;animation:fadeUp .3s ease;text-align:center">
       <div style="font-size:2.5rem;margin-bottom:10px">👑</div>
       <div style="font-family:var(--font-display);font-size:1.1rem;font-weight:900;text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px">You're on the list!</div>
-      <p style="color:var(--muted2);font-size:.875rem;margin-bottom:20px;font-family:var(--font-body);line-height:1.5">We'll email <strong>${alreadyJoined}</strong> the moment MindRep+ launches.</p>
+      <p style="color:var(--muted2);font-size:.875rem;margin-bottom:20px;font-family:var(--font-body);line-height:1.5">We'll email <strong>${escapeHtml(alreadyJoined)}</strong> the moment MindRep+ launches.</p>
       <button id="waitlist-close" class="btn btn-primary btn-block">Got it</button>
     </div>
   ` : `

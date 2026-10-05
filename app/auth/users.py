@@ -3,7 +3,7 @@
 import logging
 import uuid
 from collections.abc import AsyncGenerator
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 from fastapi import Depends, Request
 from fastapi_users import BaseUserManager, InvalidPasswordException, UUIDIDMixin
@@ -12,7 +12,7 @@ from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.auth.models import AccessToken, User
-from app.auth.schemas import UserCreate
+from app.auth.schemas import UserCreate, UserUpdate
 from app.config import settings
 from app.db import get_async_session
 from app.email.resend_client import EmailNotConfigured, send_email
@@ -52,6 +52,73 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
                 reason="Password must not contain your email address."
             )
 
+    def check_password(self, user: User, password: str | None) -> bool:
+        if not password:
+            return False
+        verified, _ = self.password_helper.verify_and_update(
+            password, user.hashed_password
+        )
+        return verified
+
+    async def update(
+        self,
+        user_update: UserUpdate,
+        user: User,
+        safe: bool = False,
+        request: Optional[Request] = None,
+    ) -> User:
+        """Changing email or password requires the current password.
+
+        `safe=True` is the self-service PATCH /users/me path. A superuser
+        editing someone else (safe=False) is not asked for that user's
+        password.
+        """
+        if safe:
+            changes = user_update.create_update_dict()
+            changing_email = (
+                "email" in changes and changes["email"] != user.email
+            )
+            changing_password = changes.get("password") is not None
+            if (changing_email or changing_password) and not self.check_password(
+                user, getattr(user_update, "current_password", None)
+            ):
+                raise InvalidPasswordException(
+                    reason="Current password is incorrect."
+                )
+        return await super().update(user_update, user, safe, request)
+
+    async def on_after_update(
+        self,
+        user: User,
+        update_dict: dict[str, Any],
+        request: Optional[Request] = None,
+    ) -> None:
+        """A password change signs out every other device.
+
+        Same reasoning as on_after_reset_password, except the session making
+        the change is kept so the athlete isn't bounced to the login screen.
+        """
+        if update_dict.get("password") is None:
+            return
+        current = (
+            request.cookies.get(settings.SESSION_COOKIE_NAME) if request else None
+        )
+        await self._revoke_sessions(user, keep_token=current)
+        logger.info("Revoked other sessions for %s after password change", user.id)
+
+    async def _revoke_sessions(
+        self, user: User, keep_token: str | None = None
+    ) -> None:
+        session: AsyncSession | None = getattr(self.user_db, "session", None)
+        if session is None:  # pragma: no cover - adapter always sets this
+            logger.warning("Could not revoke sessions for %s", user.id)
+            return
+        statement = delete(AccessToken).where(AccessToken.user_id == user.id)
+        if keep_token:
+            statement = statement.where(AccessToken.token != keep_token)
+        await session.execute(statement)
+        await session.commit()
+
     async def on_after_register(
         self, user: User, request: Optional[Request] = None
     ) -> None:
@@ -86,14 +153,7 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
         point. This is the concrete payoff of database-backed sessions —
         a stateless JWT could not be revoked here.
         """
-        session: AsyncSession | None = getattr(self.user_db, "session", None)
-        if session is None:  # pragma: no cover - adapter always sets this
-            logger.warning("Could not revoke sessions for %s", user.id)
-            return
-        await session.execute(
-            delete(AccessToken).where(AccessToken.user_id == user.id)
-        )
-        await session.commit()
+        await self._revoke_sessions(user)
         logger.info("Revoked all sessions for %s after password reset", user.id)
 
 

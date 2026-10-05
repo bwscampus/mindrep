@@ -7,15 +7,9 @@
 import { api, ApiError } from '../utils/api.js';
 import { showToast } from '../utils/gamification.js';
 import { heroIllustration } from '../utils/illustrations.js';
+import { escapeHtml } from '../utils/escape.js';
 
 const MIN_PASSWORD_LENGTH = 8;
-
-// Interpolated into markup, so it has to be escaped.
-function escapeAttr(value) {
-  return String(value ?? '')
-    .replace(/&/g, '&amp;').replace(/"/g, '&quot;')
-    .replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
 
 // fastapi-users answers with machine codes; athletes need sentences.
 function friendlyError(error) {
@@ -63,7 +57,7 @@ export function renderAuth(onAuthenticated, resetToken = null) {
       title: 'Welcome back',
       subtitle: 'Sign in to pick up your streak where you left off.',
       fields: `
-        <input id="email-input" type="email" autocomplete="email" placeholder="Email" value="${escapeAttr(email)}" style="${inputStyle}" />
+        <input id="email-input" type="email" autocomplete="email" placeholder="Email" value="${escapeHtml(email)}" style="${inputStyle}" />
         <input id="password-input" type="password" autocomplete="current-password" placeholder="Password" style="${inputStyle}" />
       `,
       submit: 'Sign In →',
@@ -79,7 +73,7 @@ export function renderAuth(onAuthenticated, resetToken = null) {
       title: 'Create your account',
       subtitle: 'Your progress syncs to your account, so it follows you to any device.',
       fields: `
-        <input id="email-input" type="email" autocomplete="email" placeholder="Email" value="${escapeAttr(email)}" style="${inputStyle}" />
+        <input id="email-input" type="email" autocomplete="email" placeholder="Email" value="${escapeHtml(email)}" style="${inputStyle}" />
         <input id="password-input" type="password" autocomplete="new-password" placeholder="Password (${MIN_PASSWORD_LENGTH}+ characters)" style="${inputStyle}" />
       `,
       submit: 'Create Account →',
@@ -87,6 +81,10 @@ export function renderAuth(onAuthenticated, resetToken = null) {
         <div style="font-size:.85rem;color:var(--muted)">
           Already have an account? <button id="go-login" style="${linkStyle}">Sign in</button>
         </div>
+        <p style="margin-top:14px;font-size:.75rem;color:var(--muted);line-height:1.5">
+          Under 13? Ask a parent or guardian before signing up.
+          <a href="/privacy.html" target="_blank" rel="noopener" style="color:var(--teal)">Privacy Policy</a>
+        </p>
       `
     }),
 
@@ -94,7 +92,7 @@ export function renderAuth(onAuthenticated, resetToken = null) {
       title: 'Reset your password',
       subtitle: 'Enter your email and we\'ll send a link to choose a new password.',
       fields: `
-        <input id="email-input" type="email" autocomplete="email" placeholder="Email" value="${escapeAttr(email)}" style="${inputStyle}" />
+        <input id="email-input" type="email" autocomplete="email" placeholder="Email" value="${escapeHtml(email)}" style="${inputStyle}" />
       `,
       submit: 'Send Reset Link →',
       footer: `<button id="go-login" style="${linkStyle}">← Back to sign in</button>`

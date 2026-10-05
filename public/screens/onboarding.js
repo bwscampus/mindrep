@@ -4,6 +4,7 @@ import { SPORTS, AGE_GROUPS } from '../data/lessons.js';
 import { saveUser, saveProgress, getProgress } from '../utils/storage.js';
 import { showToast } from '../utils/gamification.js';
 import { heroIllustration } from '../utils/illustrations.js';
+import { escapeHtml } from '../utils/escape.js';
 
 export function renderOnboarding(onComplete) {
   let step = 1;
@@ -31,7 +32,7 @@ export function renderOnboarding(onComplete) {
         <h2 style="font-family:'Outfit',sans-serif;font-size:1.75rem;font-weight:900;margin-bottom:12px;line-height:1.3">Train Your Mind.<br>Dominate Your Game.</h2>
         <p style="color:var(--muted);font-size:.95rem;margin-bottom:40px;line-height:1.6;max-width:320px">5-10 minute daily lessons based on elite sports psychology. Build mental toughness in 30 days.</p>
         <div style="width:100%;max-width:360px;margin:0 auto">
-          <input id="name-input" type="text" placeholder="Enter your first name" value="${name}"
+          <input id="name-input" type="text" placeholder="Enter your first name" value="${escapeHtml(name)}"
             style="width:100%;background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.12);border-radius:14px;padding:18px 20px;color:var(--text);font-size:1.05rem;font-family:'Outfit',sans-serif;font-weight:600;margin-bottom:16px;transition:border-color .2s"
           />
           <button id="step1-next" class="btn btn-primary btn-block btn-lg">Get Started →</button>

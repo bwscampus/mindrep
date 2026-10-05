@@ -30,6 +30,11 @@ def install_auth_routes(app: FastAPI, prefix: str = "/api") -> None:
     auth_router.include_router(fastapi_users.get_reset_password_router())
 
     app.include_router(auth_router, prefix=f"{prefix}/auth", tags=["auth"])
+    # DELETE /me (self-service). Registered before the fastapi-users router,
+    # whose DELETE /{id} would otherwise match "me" first.
+    from app.auth.account import router as account_router
+
+    app.include_router(account_router, prefix=f"{prefix}/users", tags=["users"])
     # GET/PATCH /me
     app.include_router(
         fastapi_users.get_users_router(UserRead, UserUpdate),

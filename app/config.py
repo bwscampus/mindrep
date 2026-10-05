@@ -12,6 +12,7 @@ from pydantic import Field, computed_field, field_validator, model_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 INSECURE_SECRET = "dev-insecure-change-me"
+PLACEHOLDER_RESEND_PREFIX = "re_PLACEHOLDER"
 
 
 # pydantic-settings JSON-decodes complex fields in the source layer, before
@@ -61,6 +62,10 @@ class Settings(BaseSettings):
     RATE_LIMIT_LOGIN: str = "10/minute"
     RATE_LIMIT_FORGOT_PASSWORD: str = "5/hour"
     RATE_LIMIT_REGISTER: str = "10/hour"
+    RATE_LIMIT_ACCOUNT_CHANGE: str = "10/hour"
+
+    # Largest progress/profile document PUT /api/state will store.
+    MAX_STATE_BYTES: int = 256 * 1024
 
     # Extra CSP sources a project needs on top of the strict 'self' baseline.
     CSP_ALLOW_INLINE_STYLES: bool = False
@@ -127,6 +132,7 @@ class Settings(BaseSettings):
                 "RESEND_API_KEY is required: password reset cannot send mail "
                 "without it"
             )
+
         if self.ALLOWED_HOSTS == ["*"]:
             problems.append(
                 "ALLOWED_HOSTS must name your real host(s), not '*'"
@@ -143,6 +149,22 @@ class Settings(BaseSettings):
                 + "\n  - ".join(problems)
             )
         return self
+
+    def startup_warnings(self) -> list[str]:
+        """Misconfigurations that are wrong but not yet fatal.
+
+        A placeholder Resend key means password reset silently sends nothing.
+        It is a warning rather than a boot failure only because the live
+        deploy still runs on the placeholder; once a real key is set, move
+        this into _production_requires_real_config.
+        """
+        warnings: list[str] = []
+        if (self.RESEND_API_KEY or "").startswith(PLACEHOLDER_RESEND_PREFIX):
+            warnings.append(
+                "RESEND_API_KEY is a placeholder: password reset emails will "
+                "not be delivered"
+            )
+        return warnings
 
     def content_security_policy(self) -> str:
         style = ["'self'", *self.CSP_STYLE_SRC_EXTRA]

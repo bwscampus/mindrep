@@ -88,6 +88,12 @@ export const api = {
     return request('/auth/logout', { method: 'POST' });
   },
 
+  // Deletes the account and all its progress. The server asks for the
+  // password again so a borrowed, signed-in device can't do it.
+  deleteAccount(password) {
+    return request('/users/me', { method: 'DELETE', json: { password } });
+  },
+
   // Always resolves the same way whether or not the account exists.
   forgotPassword(email) {
     return request('/auth/forgot-password', { method: 'POST', json: { email } });

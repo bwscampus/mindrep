@@ -1,6 +1,7 @@
 """Request-scoped logging: an id on every line, no tracebacks to clients."""
 
 import logging
+import re
 import sys
 import time
 import uuid
@@ -12,6 +13,9 @@ from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
 request_id_var: ContextVar[str] = ContextVar("request_id", default="-")
+# A client-supplied id is echoed into every log line, so it must not be able
+# to carry newlines or forge log entries.
+_REQUEST_ID_PATTERN = re.compile(r"^[A-Za-z0-9-]{1,64}$")
 logger = logging.getLogger("app")
 
 
@@ -44,7 +48,12 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
         request: Request,
         call_next: Callable[[Request], Awaitable[Response]],
     ) -> Response:
-        request_id = request.headers.get("X-Request-ID") or uuid.uuid4().hex[:12]
+        supplied = request.headers.get("X-Request-ID", "")
+        request_id = (
+            supplied
+            if _REQUEST_ID_PATTERN.match(supplied)
+            else uuid.uuid4().hex[:12]
+        )
         token = request_id_var.set(request_id)
         started = time.perf_counter()
         try:

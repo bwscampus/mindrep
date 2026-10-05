@@ -45,4 +45,5 @@ async def send_email(to: str, subject: str, html: str) -> None:
         resend.Emails.send(params)
 
     await asyncio.to_thread(_send)
-    logger.info("Sent %r to %s", subject, to)
+    # The recipient is personal data; callers log the user id instead.
+    logger.info("Sent %r", subject)
