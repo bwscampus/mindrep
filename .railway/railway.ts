@@ -6,7 +6,7 @@ export const partial = "mindrep";
 
 export default defineRailway(() => {
   const mindrep = service("mindrep", {
-    start: "alembic upgrade head && exec uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips='*'",
+    start: "alembic upgrade head && python -m app.db_roles && exec uvicorn app.main:app --host 0.0.0.0 --port $PORT --proxy-headers --forwarded-allow-ips='*'",
     healthcheck: "/api/health",
     healthcheckTimeout: 120,
     // builder from CaC: "RAILPACK"
