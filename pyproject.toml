@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "FastAPI backend with cookie-session auth, Postgres, and Railway deploy"
 requires-python = ">=3.13,<3.14"
 dependencies = [
-    "fastapi>=0.115",
+    "fastapi>=0.142.2",
     "uvicorn[standard]>=0.54.0",
     "fastapi-users[sqlalchemy]>=15.0",
     "sqlalchemy[asyncio]>=2.0",
