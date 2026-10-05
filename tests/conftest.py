@@ -62,8 +62,12 @@ def app(engine):
 
 @pytest.fixture
 async def client(app):
+    # Browsers send Origin on every POST; the API rejects cross-site writes
+    # (app/security.py OriginCheckMiddleware), so tests behave like the site.
     async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://testserver"
+        transport=ASGITransport(app=app),
+        base_url="http://testserver",
+        headers={"Origin": "http://testserver"},
     ) as ac:
         yield ac
 

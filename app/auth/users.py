@@ -3,9 +3,10 @@
 import logging
 import uuid
 from collections.abc import AsyncGenerator
+from datetime import datetime, timedelta, timezone
 from typing import Any, Optional, Union
 
-from fastapi import Depends, Request
+from fastapi import Depends, Request, Response
 from fastapi_users import BaseUserManager, InvalidPasswordException, UUIDIDMixin
 from fastapi_users_db_sqlalchemy import SQLAlchemyUserDatabase
 from sqlalchemy import delete
@@ -122,6 +123,32 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
             )
         await session.execute(statement)
         await session.commit()
+
+    async def on_after_login(
+        self,
+        user: User,
+        request: Optional[Request] = None,
+        response: Optional[Response] = None,
+    ) -> None:
+        """Opportunistically purge expired sessions (anyone's).
+
+        Expired rows are already rejected at read time (DatabaseStrategy
+        checks lifetime), so this is housekeeping: the table would otherwise
+        grow forever. Logins are infrequent and the table is small, so one
+        DELETE here is cheap and needs no cron service.
+        """
+        session: AsyncSession | None = getattr(self.user_db, "session", None)
+        if session is None:  # pragma: no cover - adapter always sets this
+            return
+        cutoff = datetime.now(timezone.utc) - timedelta(
+            seconds=settings.SESSION_LIFETIME_SECONDS
+        )
+        result = await session.execute(
+            delete(AccessToken).where(AccessToken.created_at < cutoff)
+        )
+        await session.commit()
+        if result.rowcount:
+            logger.info("Purged %s expired sessions", result.rowcount)
 
     async def on_after_register(
         self, user: User, request: Optional[Request] = None
