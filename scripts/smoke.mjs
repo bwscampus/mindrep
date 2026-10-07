@@ -3,6 +3,7 @@
 
 import { spawn } from "node:child_process";
 import { setTimeout as sleep } from "node:timers/promises";
+import { get as httpGet } from "node:http";
 
 const PORT = 8123;
 const BASE = `http://127.0.0.1:${PORT}`;
@@ -41,6 +42,42 @@ try {
 
   const missing = await fetch(`${BASE}/utils/does-not-exist.js`);
   check("        unknown path 404s", missing.status === 404);
+
+  // The deploy-correctness check. Without revalidation headers a browser can
+  // apply heuristic freshness and keep running old JavaScript against a new
+  // server, which took the live app down for returning users once already.
+  check("        html/js revalidate (no-cache)",
+    (h.get("cache-control") ?? "").includes("no-cache"));
+  const js = await fetch(`${BASE}/app.js`);
+  check("        app.js revalidates too",
+    (js.headers.get("cache-control") ?? "").includes("no-cache"));
+  // Raw http, not fetch: undici does not implement an HTTP cache and answers
+  // 200 to a conditional request, which would make this assertion lie.
+  const etag = js.headers.get("etag");
+  const conditional = await new Promise((resolve) => {
+    httpGet(
+      { host: "127.0.0.1", port: PORT, path: "/app.js", headers: { "if-none-match": etag } },
+      (res) => { res.resume(); resolve(res.statusCode); }
+    );
+  });
+  check("        revalidation is cheap (304)", conditional === 304, `got ${conditional}`);
+
+  // PRIV-1/PRIV-2. Users are 10-18, so the privacy link and the parental
+  // notice are not decoration. They were silently lost once already, when the
+  // screen that carried them was deleted, so assert they are reachable.
+  const privacy = await fetch(`${BASE}/privacy.html`);
+  check("PRIV-1 privacy page served", privacy.status === 200);
+
+  const onboarding = await (await fetch(`${BASE}/screens/onboarding.js`)).text();
+  check("PRIV-1 onboarding links to the privacy policy",
+    onboarding.includes("/privacy.html"));
+  check("PRIV-2 onboarding carries the under-13 notice",
+    /under 13/i.test(onboarding));
+
+  // FE-7: progress lives in the browser; clearing it must be possible.
+  const profile = await (await fetch(`${BASE}/screens/achievements.js`)).text();
+  check("FE-7   data-erase control is unconditional",
+    /id="reset-progress"/.test(profile) && !/\$\{admin \? `<button[^`]*reset-progress/.test(profile));
 } finally {
   server.kill();
 }

@@ -25,14 +25,19 @@ not a leaked database or backup.
 
 | # | Rule | Sev | Where | Finding | Status |
 |---|------|-----|-------|---------|--------|
-| 1 | PRIV-1, PRIV-2 | High | `public/privacy.html` | Users are 10–18 and the app stores names, journal text, self-ratings and coach chat. The privacy page is a **DRAFT placeholder**, and under-13 users trigger US COPPA. Data staying on-device reduces but does not remove the obligation. | **Owner**: the school supplies the policy text and decides the under-13 approach. |
+| 1 | PRIV-1, PRIV-2 | High | `public/screens/onboarding.js`, `public/privacy.html` | Onboarding collects a minor's first name, sport and age group. The rollback deleted the sign-in screen, which was the **only** thing linking the privacy policy and carrying the "Under 13? Ask a parent" notice — so `privacy.html` was still served but unreachable, and the parental notice was gone entirely. | **Fixed** (2026-10-07): both restored on onboarding step 1, with smoke-test guards so the next deletion fails CI. **Owner** still: the policy text is a DRAFT placeholder and the under-13 approach is the school's decision. |
 | 2 | FE-3 | Medium | `public/screens/modules.js`, `public/data/lessons.js` | Module locks are client-side only, and all lesson content ships to every browser. Fine for a free beta; blocks charging money. | **Open** (student): needs a server to be real. |
 | 3 | FE-5 | Medium | `public/screens/*.js` | ~490 inline `style=` attributes, which force `'unsafe-inline'` in the style CSP. | **Open**: move to classes in `style.css`; then tighten `style-src`. |
 | 4 | FE-4 | Low | `public/style.css`, `public/screens/*.js` | `outline: none` with no `:focus-visible` replacement; inputs use placeholders instead of `<label>`. | **Open** |
 | 5 | OPS-6 | Medium | n/a | No error tracking or uptime monitoring. | **Open**: an uptime monitor on `/api/health` is the cheap half. |
 | 6 | OPS-3, OPS-4 | n/a | GitHub settings | Secret scanning, push protection, and branch protection requiring CI. | **Owner** |
 | 7 | OPS-1 | n/a | Railway settings | Turn on "Wait for CI" so a red build never deploys. | **Owner** |
-| 8 | FE-7 | Low | `public/utils/storage.js` | All progress stays in `localStorage` with no way to clear it from the UI. On a shared device the next person sees the previous athlete's journal. | **Open** (student): a "Reset my data" control. Was previously covered by sign-out; that went away with accounts. |
+| 8 | FE-7 | Medium | `public/screens/achievements.js` | All progress sits in `localStorage` and the student's "Reset Progress" control was gated on `admin`, which the rollback pinned to `false` — so it could never render. Sign-out used to clear `mindrep_*`; that went away with accounts. On a shared device the next athlete inherits the previous one's journal. | **Fixed** (2026-10-07): the control is unconditional and relabelled "Erase my data from this device". |
+
+| 9 | PRIV-3, DB-7 | High | Railway (deleted) | The Postgres service from the pre-rollback app was still provisioned and Online after the app went static, with a PITR bucket of backups. | **Fixed** (2026-10-07, on explicit instruction). Inventory first: 2 accounts (one `@example.com` smoke test, one `@bwscampus.com`) and **zero journal entries** — no athlete data had accumulated, so no export was warranted. Deleted the `Postgres` service and the `Postgres-PITR` bucket; the `postgres-volume` (1.2 GB) is scheduled for deletion on 2026-10-09 by Railway's grace period. Production verified healthy after. |
+| 10 | DB-3 | Medium | Railway `mindrep` service variables | `DATABASE_URL`, `MIGRATION_DATABASE_URL` and `APP_DB_PASSWORD` now point at a deleted service; `SECRET_KEY` and `RESEND_API_KEY` are live credentials the static server never reads. | **Owner**: unsetting a variable triggers a redeploy, so this was left for you. Unset all five, and **rotate** `RESEND_API_KEY` rather than just deleting it — it can still send mail as you. |
+
+| 11 | OPS-7 | **High** (resolved) | `server.js` | The previous FastAPI deployment served static files with an ETag but **no `Cache-Control`**, so browsers applied heuristic freshness and stopped revalidating. After the rollback, returning visitors ran the old cached JavaScript against the new static server: it called `/api/users/me`, got 404, and rendered the app's own "Can't reach MindRep" screen. The site looked down to anyone who had used it before, while being perfectly healthy to a fresh visitor or `curl`. | **Fixed** (2026-10-07): HTML, JS, CSS and JSON are served `Cache-Control: no-cache` — revalidate before use, still a cheap 304 when unchanged. Guarded in `npm run smoke`. Anyone still stuck needs one hard reload. |
 
 ## Satisfied by the current build
 
@@ -68,6 +73,13 @@ and self-service deletion (AUTH-5/6), the cross-site write block (API-6) — wen
 with the backend on 2026-10-07. It is preserved in git history, and in
 `~/.claude/skills/production-standard/assets/templates/fastapi/`, if accounts are ever
 rebuilt.
+
+**2026-10-07 post-rollback audit.** Ran the full standard against the deployed static
+app. The headers, config gate, licensing and CI all pass in production. Two regressions
+the rollback introduced were found and fixed (#1, #8) — both were controls that lived on
+the deleted sign-in screen, which is the characteristic way a rollback loses safety
+properties. Two owner actions were raised (#9, #10): the orphaned database and its stale
+credentials.
 
 **2026-10-07 rollback.** The app returned to the student's `localStorage` design;
 accounts, server-side sync and the FastAPI backend were removed as assistant-written

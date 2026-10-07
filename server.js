@@ -106,6 +106,26 @@ app.setErrorHandler((err, req, reply) => {
 // There is no database to ping; if this process answers, it can serve the app.
 app.get("/api/health", async () => ({ status: "ok" }));
 
+// Cache policy, set before the static plugin so it applies to its responses.
+//
+// `no-cache` means "revalidate before using", not "don't cache": the browser
+// still stores the file and still gets a cheap 304 when nothing changed.
+// It is explicit because the previous deployment served these files with an
+// ETag but NO Cache-Control, which lets a browser apply *heuristic* freshness
+// and stop asking altogether. Returning visitors then ran months-old
+// JavaScript against a new server — which is exactly how this app started
+// showing its own "Can't reach MindRep" screen to people who had used it
+// before.
+//
+// The app has no build step, so there are no content-hashed filenames to lean
+// on instead. Until there are, revalidation is what keeps a deploy honest.
+app.addHook("onSend", async (req, reply) => {
+  if (req.url.startsWith("/api/")) return;
+  const path = req.url.split("?")[0];
+  const mutable = path === "/" || /\.(html|js|css|json)$/.test(path);
+  reply.header("Cache-Control", mutable ? "no-cache" : "public, max-age=3600");
+});
+
 // Static last, so it cannot shadow a route added above it.
 await app.register(fstatic, { root: PUBLIC_DIR, index: ["index.html"] });
 

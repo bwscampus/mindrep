@@ -194,7 +194,10 @@ export function renderAchievements(navigate) {
       </div>
 
 
-      ${admin ? `<button class="btn btn-secondary btn-sm" id="reset-progress" style="opacity:.5;margin-bottom:8px;width:100%">🗑 Reset Progress</button>` : ''}
+      <!-- FE-7: progress lives in this browser, so clearing it has to be
+           possible from the UI — otherwise the next person on a shared device
+           inherits the previous athlete's journal. -->
+      <button class="btn btn-secondary btn-sm" id="reset-progress" style="opacity:.6;margin-bottom:8px;width:100%">🗑 Erase my data from this device</button>
       <div style="height:16px"></div>
     </div>
 
