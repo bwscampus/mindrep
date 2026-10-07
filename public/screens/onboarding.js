@@ -38,6 +38,10 @@ export function renderOnboarding(onComplete) {
           <button id="step1-next" class="btn btn-primary btn-block btn-lg">Get Started →</button>
         </div>
         <p style="margin-top:20px;font-size:.75rem;color:var(--muted)">Free to start • No credit card required</p>
+        <p style="margin-top:10px;font-size:.72rem;color:var(--muted);line-height:1.5;max-width:320px;margin-left:auto;margin-right:auto">
+          Under 13? Ask a parent or guardian first.<br>
+          Your answers stay on this device. <a href="/privacy.html" target="_blank" rel="noopener" style="color:var(--teal)">Privacy Policy</a>
+        </p>
       </div>
     `;
   }

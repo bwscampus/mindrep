@@ -41,6 +41,23 @@ try {
 
   const missing = await fetch(`${BASE}/utils/does-not-exist.js`);
   check("        unknown path 404s", missing.status === 404);
+
+  // PRIV-1/PRIV-2. Users are 10-18, so the privacy link and the parental
+  // notice are not decoration. They were silently lost once already, when the
+  // screen that carried them was deleted, so assert they are reachable.
+  const privacy = await fetch(`${BASE}/privacy.html`);
+  check("PRIV-1 privacy page served", privacy.status === 200);
+
+  const onboarding = await (await fetch(`${BASE}/screens/onboarding.js`)).text();
+  check("PRIV-1 onboarding links to the privacy policy",
+    onboarding.includes("/privacy.html"));
+  check("PRIV-2 onboarding carries the under-13 notice",
+    /under 13/i.test(onboarding));
+
+  // FE-7: progress lives in the browser; clearing it must be possible.
+  const profile = await (await fetch(`${BASE}/screens/achievements.js`)).text();
+  check("FE-7   data-erase control is unconditional",
+    /id="reset-progress"/.test(profile) && !/\$\{admin \? `<button[^`]*reset-progress/.test(profile));
 } finally {
   server.kill();
 }
