@@ -1,160 +1,92 @@
 # MindRep
 
-Youth mental-performance microlearning for athletes ages 10–18. Vanilla JS
-frontend, FastAPI backend, Postgres, deployed on Railway.
+Youth mental-performance microlearning for athletes ages 10–18.
 
-## Running it locally
+The app is **vanilla HTML/CSS/JS with no build step**, written by the student
+([@iamjlee11-maker](https://github.com/iamjlee11-maker)), and it lives entirely in
+`public/`. It keeps all of its state — profile, XP, streaks, badges, journal entries,
+coach chat — in the browser's `localStorage`.
 
-```bash
-uv sync
-cp .env.example .env
+`server.js` exists only to serve that app safely. It is deployment and hardening, not
+features: security headers, a host allowlist, a health check, and a config gate that
+refuses to boot a misconfigured production deploy. There is no database, no accounts,
+and no API beyond `/api/health`.
 
-# Throwaway Postgres on 5433, to avoid clashing with any local install
-docker run -d --name mindrep-pg \
-  -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=mindrep \
-  -p 5433:5432 postgres:17-alpine
+**Features are specced and built by the student, in `public/`.** See `ROADMAP.md`.
 
-uv run alembic upgrade head
-uv run uvicorn app.main:app --reload --port 8000
-```
-
-Open http://localhost:8000 — register an account, and the app walks you into
-onboarding.
+## Running it
 
 ```bash
-uv run pytest        # 22 tests, no database server needed
+npm install
+npm run dev          # http://localhost:8000
 ```
+
+```bash
+npm test             # module/import check + server smoke test
+npm audit            # dependency check (also runs in CI)
+```
+
+You can also open `public/index.html` directly from the filesystem for quick frontend
+work — the app needs no server. You just won't get the security headers.
 
 ## Layout
 
 ```
-app/          FastAPI backend
-  main.py     app factory, middleware, static mount
-  models.py   user_state: per-athlete profile + progress JSONB
-  routers/    health, state
-  auth/       accounts, sessions, password reset
-public/       the app itself — served at /
-  app.js      router + boot
-  screens/    one module per screen (auth, home, lesson, practice, …)
-  utils/      storage (synced), api, gamification, illustrations
-  data/       lesson content
-migrations/   alembic
+public/              the app — the student's code
+  index.html
+  app.js             router and navigation shell
+  screens/           one module per screen
+  utils/             storage (localStorage), gamification, illustrations, escape
+  data/              lesson content
+  privacy.html       privacy policy (DRAFT — needs real text, see below)
+server.js            static server + security headers
+scripts/             CI checks (import graph, smoke test)
+docs/                SECURITY-GAPS.md, STACK-COMPARISON.md
 ```
 
-## How progress is stored
+## What the server does, and why
 
-`public/utils/storage.js` keeps the same **synchronous** API it always had —
-`getProgress()`, `saveProgress()`, `getUser()` — because roughly 60 call sites
-across the screens read it inside render functions that can't await anything.
+| Concern | Rule | How |
+|---|---|---|
+| Security headers on every response | API-4 | CSP, HSTS (prod), `X-Frame-Options: DENY`, nosniff, Referrer-Policy |
+| Misconfigured production can't boot | API-10 | refuses to start on `ALLOWED_HOSTS=*` or an `http://` base URL |
+| Host allowlist | API-4 | rejects requests with an unexpected `Host` header in production |
+| Generic errors | API-3 | 500s return a request id, never a stack trace |
+| Request correlation | API-8 | validated `X-Request-ID` on every response |
+| Liveness | API-9 | `/api/health`, no version or environment detail |
 
-Underneath, it is now server-backed:
+Rule IDs refer to the class Production Standard (`production-standard` skill).
 
-- `hydrate()` runs once at boot and loads the athlete's state into memory
-- reads come from that in-memory cache, synchronously
-- writes update the cache synchronously, then schedule a debounced `PUT
-  /api/state` (800ms, flushed on tab hide via `keepalive`)
+The one CSP compromise: `style-src` needs `'unsafe-inline'` because the screens use
+inline `style=` attributes. `script-src` stays strict — the app has no inline handlers
+and no `eval`, which is what actually stops XSS.
 
-Progress is one JSON document per athlete, so adding a field to a lesson
-activity needs no migration.
+## Adding a feature
 
-**Trade-off:** last-write-wins. Two devices editing simultaneously means the
-later write wins. Acceptable for one athlete's own progress.
+1. Write it in `public/`. No build step, no framework, no npm for frontend code.
+2. Anything a user typed goes through `escapeHtml` from `public/utils/escape.js`
+   before it reaches `innerHTML`. That rule has a test; please keep it true.
+3. Run `npm test` before committing.
 
-**If you add state:** put it in the `progress` object via `saveProgress()`.
-Writing straight to `localStorage` means it stays on one device. The reminder
-preferences in `app.js` do that deliberately — they're per-device by nature.
-
-## Accounts
-
-Email and password, with reset. Sessions are an httpOnly cookie backed by a
-database row, so signing out or resetting a password revokes every device
-immediately. Athletes who used the localStorage-only version keep their
-progress: on first login it's uploaded if the account is empty.
-
-⚠️ **Password reset does not send email yet.** `RESEND_API_KEY` on the deployed
-service is the placeholder `re_PLACEHOLDER_REPLACE_ME`. The endpoint still
-answers 202 and logs the failure (deliberately — see below), but no mail goes
-out. Set a real key, and note that Resend delivers to arbitrary inboxes only
-from a **verified domain**: the default `onboarding@resend.dev` sender reaches
-only the Resend account owner's own address.
-
-`/forgot-password` always returns 202, whether or not the account exists and
-whether or not delivery succeeds. Anything else would let anyone probe which
-email addresses have accounts.
+If a feature needs a server — accounts, cross-device sync, payments, a real AI coach —
+that is a bigger change than this repo currently supports. Spec it first; see
+`ROADMAP.md` Phase 3 and `docs/STACK-COMPARISON.md`.
 
 ## Deploying
 
-Live at **https://mindrep.up.railway.app**
+Railway, from the `Procfile` (`web: node server.js`). Set in service variables:
 
-```bash
-railway up      # from the repo root, once linked
+```
+ENVIRONMENT=production
+PUBLIC_BASE_URL=https://<your-app>.up.railway.app
+ALLOWED_HOSTS=<your-app>.up.railway.app
 ```
 
-The start command lives in `Procfile`: migrations run, then uvicorn starts.
-Required variables are already set on the service; to recreate the project
-elsewhere:
+The app refuses to boot in production if those are missing or wrong, so a bad deploy
+fails loudly and the previous version keeps serving.
 
-```bash
-railway init && railway add --database postgres && railway add --service mindrep
-railway domain
-railway variables --set ENVIRONMENT=production \
-  --set SECRET_KEY="$(python3 -c 'import secrets; print(secrets.token_urlsafe(48))')" \
-  --set 'DATABASE_URL=${{Postgres.DATABASE_URL}}' \
-  --set RESEND_API_KEY=re_xxx --set EMAIL_FROM=noreply@yourdomain.com \
-  --set PUBLIC_BASE_URL=https://<your-app>.up.railway.app \
-  --set ALLOWED_HOSTS=<your-app>.up.railway.app,healthcheck.railway.app \
-  --set CSP_ALLOW_INLINE_STYLES=true \
-  --set CSP_STYLE_SRC_EXTRA=https://fonts.googleapis.com \
-  --set CSP_FONT_SRC_EXTRA=https://fonts.gstatic.com
-railway up
-```
+## Known gaps
 
-Migrations run on every deploy before the server starts. The app refuses to
-boot in production with missing or placeholder secrets, so a misconfigured
-deploy fails loudly and the previous version keeps serving.
-
-The three CSP variables are required: the app uses inline `style` attributes
-and Google Fonts. Without them the deployed app renders unstyled.
-
-### Database roles
-
-Migrations run as the database owner; the app is meant to run as
-`app_rw_login`, a role that can read and write the app's tables but cannot
-change the schema, create roles, or bypass row-level security. After every
-migration, `python -m app.db_roles` (in the start command) creates or updates
-that role. It only creates the login role, and (re)sets its password, when
-`APP_DB_PASSWORD` is set.
-
-> **Not yet applied in production.** Production still connects as `postgres`.
-> To switch over, after this code is deployed:
-
-1. Add a **sealed** variable on the `mindrep` service:
-   `APP_DB_PASSWORD=$(python3 -c 'import secrets; print(secrets.token_urlsafe(32))')`.
-2. Point migrations at the owner and the app at the restricted role:
-   ```bash
-   railway variables \
-     --set 'MIGRATION_DATABASE_URL=${{Postgres.DATABASE_URL}}' \
-     --set 'DATABASE_URL=postgresql://app_rw_login:${{APP_DB_PASSWORD}}@${{Postgres.PGHOST}}:${{Postgres.PGPORT}}/${{Postgres.PGDATABASE}}'
-   ```
-3. The redeploy runs migrations as the owner, creates `app_rw_login`, and
-   starts the app as it. Check `/api/health` returns 200, sign in, and change
-   something (e.g. complete a lesson) to exercise a write.
-
-**Rollback:** set `DATABASE_URL` back to `${{Postgres.DATABASE_URL}}` and
-redeploy. The role can stay; it's harmless unused.
-
-To rotate the password, change `APP_DB_PASSWORD` and redeploy.
-`tests/test_postgres.py` checks the grants against a real Postgres (CI runs it).
-
-See `ROADMAP.md` for what's built and what's next.
-
-## License
-
-MindRep is source-available under the [PolyForm Noncommercial License 1.0.0](LICENSE.md).
-Copyright 2026 The MindRep founders.
-
-- **Noncommercial use is free.** Personal study, learning, hobby projects, schools, and nonprofits may
-  use, copy, modify, and share the code, as long as they include the license and its `Required Notice:` line.
-- **Commercial use is reserved to the founders,** who keep all rights to the code and the product. To ask
-  about commercial use, open an issue on this repository.
-- Third-party libraries and assets keep their own licenses.
+`docs/SECURITY-GAPS.md`. The one that needs a person rather than code: **`privacy.html`
+is a draft placeholder.** Users are 10–18, which brings COPPA into scope, and the real
+policy text and the under-13 approach are a decision for the school.

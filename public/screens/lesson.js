@@ -3,8 +3,11 @@
 import { MODULES } from '../data/lessons.js';
 import { getProgress, saveProgress } from '../utils/storage.js';
 import { completeLesson, checkAndUnlockBadges, fireConfetti, showToast, floatXP } from '../utils/gamification.js';
-import { isAdmin } from '../utils/admin.js';
 import { moduleIcon } from '../utils/illustrations.js';
+
+// Demo mode was removed: the passphrase that unlocked it shipped in this public
+// repo (Production Standard FE-2), so it is burned. Re-spec it with server-side
+// enforcement when the paid tier is built — see ROADMAP.md.
 
 let currentSection = 0;
 let lessonData = null;
@@ -38,7 +41,7 @@ export function renderLesson(lessonId, navigate) {
   }
 
   if (!lessonData || !lessonData.sections) {
-    const admin = isAdmin();
+    const admin = false;
     document.getElementById('app').innerHTML = admin
       ? `<div class="screen text-center" style="padding-top:80px">
           <div style="font-size:4rem">🚧</div>
@@ -527,7 +530,7 @@ function completeLessonFlow() {
   document.getElementById('go-home')?.addEventListener('click', () => navigateFn('home'));
   document.getElementById('go-next')?.addEventListener('click', () => {
     const completed = progress.completedLessons;
-    const adminMode = isAdmin();
+    const adminMode = false;
     let next = null;
     for (const mod of MODULES) {
       if (!adminMode && mod.locked) continue;

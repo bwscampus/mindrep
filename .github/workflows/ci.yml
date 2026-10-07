@@ -11,43 +11,26 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: app
-        ports: ["5432:5432"]
-        options: >-
-          --health-cmd pg_isready --health-interval 5s
-          --health-timeout 5s --health-retries 10
     steps:
       - uses: actions/checkout@v7
-      - uses: astral-sh/setup-uv@v7
-      # --locked (not --frozen): fail if uv.lock is out of date with
-      # pyproject.toml, exactly as Railway's `uv sync --locked` build does.
-      - run: uv sync --locked
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
 
-      # Unit and API tests run on in-memory SQLite (see tests/conftest.py).
-      # TEST_POSTGRES_URL enables tests/test_postgres.py: the restricted app
-      # role's grants and the token-hash migration, which SQLite can't test.
-      - run: uv run pytest
-        env:
-          TEST_POSTGRES_URL: postgresql://postgres:postgres@localhost:5432/postgres
+      # --ci fails if package-lock.json is out of date with package.json,
+      # which is also what Railway's build does.
+      - run: npm ci
 
-      # Migrations against real Postgres catch what SQLite hides (JSONB,
-      # constraints), and `alembic check` fails if a model changed without
-      # a migration.
-      - name: Migrations on Postgres
-        env:
-          ENVIRONMENT: test
-          DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/app
-        run: |
-          uv run alembic upgrade head
-          uv run alembic check
-          APP_DB_PASSWORD=ci-only-password uv run python -m app.db_roles
+      # The app is vanilla JS with no build step, so there is no compiler to
+      # catch a renamed export or a deleted module. This is the substitute.
+      - name: Check public/ modules and imports
+        run: npm run check:imports
+
+      # Boots the server and asserts the Production Standard response rules
+      # (API-4 headers, API-8 request id, API-9 health) actually hold.
+      - name: Smoke test
+        run: npm run smoke
 
       - name: Dependency audit
-        run: |
-          uv export --frozen --no-dev --no-hashes --no-emit-project -o requirements-audit.txt
-          uvx pip-audit -r requirements-audit.txt --no-deps --disable-pip
+        run: npm audit --omit=dev --audit-level=high

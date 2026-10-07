@@ -1,18 +1,20 @@
 // screens/achievements.js — Profile, stats, badges, share card
 
 import { BADGES } from '../data/lessons.js';
-import { storage, getProgress, saveProgress, getUser, getXPForLevel, LEVEL_NAMES, resetAll } from '../utils/storage.js';
-import { signOut, deleteAccount } from '../utils/session.js';
-import { isAdmin, canUseDemoMode } from '../utils/admin.js';
+import { storage, getProgress, saveProgress, getUser, getXPForLevel, LEVEL_NAMES } from '../utils/storage.js';
+import { escapeHtml } from '../utils/escape.js';
+// Demo mode was removed from this screen: the passphrase that unlocked it shipped
+// in this public repo (Production Standard FE-2), so it is burned. The `admin`
+// flag below is pinned false. Re-spec it with server-side enforcement when the
+// paid tier is built — see ROADMAP.md.
 import { showToast, fireConfetti } from '../utils/gamification.js';
 import { drawMindGlyph } from '../utils/illustrations.js';
 import { isLockedIn } from '../utils/lockedIn.js';
-import { escapeHtml } from '../utils/escape.js';
 
 export function renderAchievements(navigate) {
   const progress    = getProgress();
   const user        = getUser();
-  const admin       = isAdmin();
+  const admin       = false;
   const xp          = admin ? 9999 : (progress.xp || 0);
   const level       = admin ? 10   : (progress.level || 1);
   const levelInfo   = getXPForLevel(level);
@@ -169,7 +171,7 @@ export function renderAchievements(navigate) {
                 ${isReached ? (isCurrent ? lv : '✓') : lv}
               </div>
               <div style="flex:1">
-                <div style="font-family:var(--font-display);font-weight:700;font-size:.95rem;text-transform:uppercase;letter-spacing:.04em">${name}</div>
+                <div style="font-family:var(--font-display);font-weight:700;font-size:.95rem;text-transform:uppercase;letter-spacing:.04em">${escapeHtml(name)}</div>
                 <div style="font-size:.7rem;color:var(--muted);font-family:var(--font-body)">${xpNeeded} XP</div>
               </div>
               ${isCurrent ? `<div style="font-family:var(--font-display);font-size:.68rem;font-weight:700;color:var(--teal);letter-spacing:.1em;text-transform:uppercase">You Are Here</div>` : ''}
@@ -191,43 +193,8 @@ export function renderAchievements(navigate) {
         </label>
       </div>
 
-      <!-- Admin trigger (staff accounts only) -->
-      ${canUseDemoMode() ? `<div id="admin-trigger" style="text-align:center;cursor:pointer;padding:16px 0;opacity:.12;font-size:.7rem;letter-spacing:.05em">⚙</div>` : ''}
-
-      <div id="admin-panel" style="display:none">
-        <div class="glass" style="padding:24px;margin-bottom:16px;border-color:${admin ? 'rgba(94,234,212,.4)' : 'rgba(255,255,255,.1)'}">
-          <div style="font-family:var(--font-display);font-weight:900;font-size:1rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">${admin ? '⚡ Demo Mode — Active' : '🔒 Demo Mode'}</div>
-          <div style="font-size:.8rem;color:var(--muted);margin-bottom:16px;font-family:var(--font-body)">${admin ? 'Full access to all features and content, for testing/demo purposes.' : 'Preview all content on this device. Available to staff accounts only.'}</div>
-          ${admin ? `
-            <div style="display:flex;flex-direction:column;gap:10px">
-              <div style="font-size:.85rem;color:var(--muted);background:rgba(94,234,212,.07);border:1px solid rgba(94,234,212,.2);border-radius:8px;padding:12px 14px;font-family:var(--font-body)">
-                ✅ All 7 modules unlocked<br>
-                ✅ All badges awarded<br>
-                ✅ Premium AI Coach active<br>
-                ✅ Full season tracker access
-              </div>
-              <button class="btn btn-secondary btn-sm" id="admin-deactivate">Deactivate Demo Mode</button>
-            </div>
-          ` : `
-            <button class="btn btn-primary btn-sm" id="admin-submit" style="width:100%">Enable Demo Mode</button>
-            <div id="admin-error" style="color:var(--coral);font-size:.8rem;margin-top:8px;display:none;font-family:var(--font-body)">Demo mode is only available to staff accounts.</div>
-          `}
-        </div>
-      </div>
 
       ${admin ? `<button class="btn btn-secondary btn-sm" id="reset-progress" style="opacity:.5;margin-bottom:8px;width:100%">🗑 Reset Progress</button>` : ''}
-      <button class="btn btn-secondary btn-sm" id="sign-out" style="width:100%;margin-bottom:8px">Sign Out</button>
-      <button class="btn btn-secondary btn-sm" id="delete-account-toggle" style="width:100%;margin-bottom:8px;opacity:.6">Delete Account</button>
-      <div id="delete-account-panel" class="glass" style="display:none;padding:20px;margin-bottom:8px;border-color:rgba(248,113,113,.4)">
-        <div style="font-family:var(--font-display);font-weight:900;font-size:1rem;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Delete your account</div>
-        <p style="font-size:.8rem;color:var(--muted);margin-bottom:12px;font-family:var(--font-body);line-height:1.5">This permanently erases your profile, progress, journal, and coach chat. It can't be undone.</p>
-        <label for="delete-account-password" style="display:block;font-size:.8rem;color:var(--muted2);margin-bottom:6px;font-family:var(--font-body)">Enter your password to confirm</label>
-        <input type="password" id="delete-account-password" autocomplete="current-password"
-          style="width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:12px 14px;color:var(--text);font-size:.9rem;margin-bottom:10px"/>
-        <button class="btn btn-primary btn-sm" id="delete-account-confirm" style="width:100%;background:var(--coral)">Permanently Delete</button>
-        <div id="delete-account-error" role="alert" style="color:var(--coral);font-size:.8rem;margin-top:8px;display:none;font-family:var(--font-body)"></div>
-      </div>
-      <a href="/privacy.html" target="_blank" rel="noopener" style="display:block;text-align:center;font-size:.75rem;color:var(--muted);margin-top:8px">Privacy</a>
       <div style="height:16px"></div>
     </div>
 
@@ -297,87 +264,13 @@ export function attachAchievementsEvents(navigate) {
   // Share progress
   document.getElementById('share-progress-btn')?.addEventListener('click', () => generateShareCard(navigate));
 
-  // Reset — clears the server copy too, not just this device
-  document.getElementById('reset-progress')?.addEventListener('click', async () => {
+  // Reset
+  document.getElementById('reset-progress')?.addEventListener('click', () => {
     if (confirm('Reset all progress? This cannot be undone.')) {
-      try {
-        await resetAll();
-      } catch {
-        showToast('Could not reach the server — progress not reset', '\u26A0\uFE0F');
-        return;
-      }
-      location.reload();
+      storage.clear(); location.reload();
     }
   });
 
-  document.getElementById('sign-out')?.addEventListener('click', async () => {
-    await signOut();
-  });
-
-  document.getElementById('delete-account-toggle')?.addEventListener('click', () => {
-    const panel = document.getElementById('delete-account-panel');
-    if (panel) panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-  });
-
-  document.getElementById('delete-account-confirm')?.addEventListener('click', async () => {
-    const button = document.getElementById('delete-account-confirm');
-    const error = document.getElementById('delete-account-error');
-    const password = document.getElementById('delete-account-password')?.value || '';
-    if (!password) {
-      error.textContent = 'Enter your password to confirm.';
-      error.style.display = 'block';
-      return;
-    }
-    button.disabled = true;
-    try {
-      await deleteAccount(password);
-    } catch (e) {
-      error.textContent = e?.status === 400
-        ? 'That password is incorrect.'
-        : e?.status === 429
-          ? 'Too many attempts. Try again later.'
-          : 'Could not delete your account. Try again.';
-      error.style.display = 'block';
-      button.disabled = false;
-    }
-  });
-
-  // Admin trigger (5 taps)
-  let tapCount = 0, tapTimer = null;
-  document.getElementById('admin-trigger')?.addEventListener('click', () => {
-    tapCount++;
-    clearTimeout(tapTimer);
-    tapTimer = setTimeout(() => { tapCount = 0; }, 2000);
-    if (tapCount >= 5) {
-      tapCount = 0;
-      const panel = document.getElementById('admin-panel');
-      if (panel) panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-    }
-  });
-
-  // Admin submit
-  const tryActivate = () => {
-    import('../utils/admin.js').then(({ activateAdmin, applyAdminUnlock }) => {
-      import('../utils/storage.js').then(({ getProgress, saveProgress }) => {
-        if (activateAdmin()) {
-          const progress = getProgress();
-          saveProgress(applyAdminUnlock(progress));
-          navigate('achievements');
-        } else {
-          const err = document.getElementById('admin-error');
-          if (err) err.style.display = 'block';
-        }
-      });
-    });
-  };
-  document.getElementById('admin-submit')?.addEventListener('click', tryActivate);
-
-  // Admin deactivate
-  document.getElementById('admin-deactivate')?.addEventListener('click', () => {
-    import('../utils/admin.js').then(({ deactivateAdmin }) => {
-      deactivateAdmin(); navigate('achievements');
-    });
-  });
 }
 
 function generateShareCard(navigate) {
