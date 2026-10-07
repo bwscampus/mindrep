@@ -1,61 +1,83 @@
 # Security gaps: MindRep
 
-Audit date: 2026-10-05. Fixes on branch `security/production-standard`; database hardening
-(DB-6, DB-8) on branch `security/db-hardening`, which builds on it.
-Rule IDs refer to the class Production Standard (the global `production-standard` Claude Code skill).
+Audit scope reset **2026-10-07**, after the app was rolled back to the student's
+`localStorage`-only design and the FastAPI backend was replaced by a Node static
+server. Rule IDs refer to the class Production Standard, which lives in the
+`production-standard` skill (`~/.claude/skills/production-standard/references/standard.md`)
+— one copy, so it can't drift.
 
-**Status key:** **Fixed** = fixed on this branch · **Open** = student task · **Owner** = a
-setting or decision for the teacher/school, not code.
+**Status key:** **Fixed** · **Open** = student or assistant task · **Owner** = a setting
+or decision for the teacher/school, not code · **N/A** = the rule has no surface in this
+architecture.
 
-## Summary
+## What this app is now
 
-The backend was already strong: ORM-only queries (no SQL injection), Argon2 password hashing,
-revocable httpOnly cookie sessions, strict CSP and security headers, CORS off by default,
-docs hidden in production, no stack traces to clients, and per-user data scoping with a test
-proving it. The real gaps were around **minors' data and consent**, **account self-service**,
-**unescaped user text in the frontend**, and **no CI**.
+Vanilla JS in `public/`, served by `server.js`. **No database, no accounts, no user
+input ever reaches a server.** That removes most of the attack surface a web app
+normally has — and with it, most of the rules. What remains is the frontend (FE-*),
+the response headers and config (API-*), privacy (PRIV-*), and repo hygiene (OPS-*).
 
-## Findings
+The data is still sensitive — minors' journals, coach chat, self-ratings — but it now
+lives only in the athlete's own browser, so the exposure is a shared or stolen device,
+not a leaked database or backup.
+
+## Current findings
 
 | # | Rule | Sev | Where | Finding | Status |
 |---|------|-----|-------|---------|--------|
-| 1 | PRIV-1, PRIV-2, PRIV-3 | High | `public/privacy.html` | Users are 10–18 and the app stores names, journal text, self-ratings and coach chat, but there was no privacy policy or parental-consent flow. Under-13 users trigger US COPPA. | **Owner**: the school must supply the policy text and decide the under-13 approach. A DRAFT placeholder page and an "Under 13? Ask a parent" notice on signup were added. |
-| 2 | AUTH-6 | High | `app/auth/account.py` | No way for a user to delete their account and data. | **Fixed**: `DELETE /api/users/me` (password required, FK cascade) plus a Delete Account panel on the Profile tab. |
-| 3 | FE-1 | Medium (High once coaches/parents can view athlete data) | `public/utils/escape.js` | User text (`user.name`, coach chat, tracker answers, toolbox entries, waitlist email) went into `innerHTML` unescaped. | **Fixed**: shared `escapeHtml` applied at every site. |
-| 4 | FE-2, FE-3 | Medium | `public/utils/admin.js` | The demo-mode passphrase was hard-coded in client JS in a public repo. | **Fixed**: demo mode is now gated on the server's `is_superuser` flag. The old passphrase is public, so treat it as burned. |
-| 5 | AUTH-5 | Medium | `app/auth/users.py` (`UserManager.update`) | `PATCH /api/users/me` changed email or password with only the session cookie, and other sessions stayed alive. | **Fixed**: `current_password` is required; a password change signs out all other sessions. |
-| 6 | AUTH-3 | Medium (hardening) | `app/rate_limit.py` | The limiter keyed on the first `X-Forwarded-For` entry. Railway staff say the edge strips client-supplied XFF, so this was probably **not** exploitable on Railway, but `X-Real-IP` is the documented contract. | **Fixed**: keys on `X-Real-IP`. |
-| 7 | AUTH-3 | Medium | `app/rate_limit.py` | The bucket table never shrank (memory growth), and `PATCH`/`DELETE /users/me` (password oracles) were unlimited. | **Fixed**: bounded LRU (10k buckets); account-change routes limited to 10/hour. |
-| 8 | API-2 | Medium | `app/routers/state.py` | `PUT /api/state` accepted any size of JSON. | **Fixed**: 256 KB cap (`MAX_STATE_BYTES`). |
-| 9 | OPS-1, OPS-2 | Medium | `.github/workflows/ci.yml` | No CI, so tests never ran before deploy. | **Fixed**: pytest, Postgres migrations, `alembic check`, `pip-audit`, Dependabot. The first audit found pyjwt PYSEC-2026-4141, bumped to 2.15.1. |
-| 10 | API-10 | Medium | `README.md:74`, `app/config.py` (`startup_warnings`) | Production `RESEND_API_KEY` is the placeholder, so password reset sends nothing. | **Owner**: set a real Resend key and verify a sending domain. The app now logs a startup warning. After that, promote the check to a boot failure. |
-| 11 | DB-5 | Medium | Railway | No backups configured or documented. | **Done** (2026-10-05, Railway Pro): daily (6-day) and weekly (27-day) snapshots, plus point-in-time recovery into the `Postgres-PITR` bucket (~4-week window). **Owner**: rehearse one restore. |
-| 12 | FE-3 | Medium | `public/screens/modules.js:54`, `public/data/lessons.js` | Paid-module locks, XP and badges are client-side only (see ROADMAP.md). Fine for a free beta; blocks charging money. | **Open** |
-| 13 | OPS-6 | Medium | n/a | No error tracking or uptime alerts. | **Open**: Sentry free tier plus an uptime monitor on `/api/health`. |
-| 14 | API-9 | Low | `app/routers/health.py` | The health check didn't touch the DB and exposed environment and version. | **Fixed**: `SELECT 1`, 503 on failure, `{"status"}` only. |
-| 15 | API-8 | Low | `app/logging.py`, `app/email/resend_client.py` | A client `X-Request-ID` was logged unchecked (log forging), and recipient emails were logged. | **Fixed** |
-| 16 | FE-7 | Low | `public/utils/session.js` | Sign-out left progress in localStorage on shared devices, which the next account could "migrate". | **Fixed**: sign-out and delete clear `mindrep_*` keys. |
-| 17 | FE-4 | Low | `public/index.html:5` | `maximum-scale=1.0` blocked pinch-zoom. | **Fixed** |
-| 18 | FE-4 | Low | `public/style.css:75-76`, `public/screens/auth.js:60` | `outline: none` with no `:focus-visible` replacement; inputs use placeholders instead of `<label>`. | **Open** |
-| 19 | FE-5 | Low | `public/screens/*.js` | About 490 inline `style=` attributes, which force `'unsafe-inline'` in the style CSP. Several color tokens are aliases of the same value. | **Open**: move to classes in `style.css`. |
-| 20 | AUTH-2 | Low | fastapi-users `is_verified` | Emails are never verified, so anyone can sign up with someone else's address. | **Open** |
-| 21 | API-6 | Low | `app/security.py` (`OriginCheckMiddleware`) | Login CSRF was possible (form-encoded POST with SameSite=Lax), so a site could sign a victim into the attacker's account. | **Fixed in `security/hardening-round-1`**: unsafe requests under `/api/` must carry an `Origin` (or `Referer`) naming this site; form-type bodies with neither are refused. 403 otherwise. |
-| 22 | DB-6 | Medium | `app/db_roles.py` | The app connected as the `postgres` superuser, so a SQL injection or leaked app credential could drop tables, create roles, or bypass any row-level security. | **Fixed in `security/db-hardening`**: the app runs as `app_rw_login` (DML only, no DDL, no superuser/BYPASSRLS), created on every deploy by `python -m app.db_roles`. **Production cut-over pending**: see README → Database roles. |
-| 23 | DB-4 | Low | `app/db.py:19` | No explicit TLS. Fine on Railway's private network; confirm `DATABASE_URL` uses `*.railway.internal`. | **Owner**: confirm |
-| 24 | n/a | Low | `app/auth/users.py` (`on_after_login`) | Expired session rows were never cleaned up. | **Fixed in `security/hardening-round-1`**: each login deletes `access_tokens` rows older than `SESSION_LIFETIME_SECONDS`. |
-| 25 | OPS-3, OPS-4 | n/a | GitHub settings | Secret scanning, push protection, and branch protection requiring CI. | **Owner** |
-| 26 | OPS-1 | n/a | Railway settings | Turn on "Wait for CI" so a red build never deploys. | **Owner** |
-| 27 | DB-8 | High | `app/auth/backend.py` | `access_tokens.token` stored the raw session token, the same value as the cookie. Anyone who could read the database or a backup could sign in as any athlete. | **Fixed in `security/db-hardening`**: only `base64url(sha256(token))` is stored; migration `0003` hashes existing rows in place, so nobody is signed out. |
-| 28 | PRIV-3, DB-7 | Medium | `user_state.progress` | Minors' journal entries, coach-chat messages, mental-state ratings and reflections are plain JSONB. Railway encrypts the disk (AES-256), but anyone with database or backup access can read them. | **Open** (decided 2026-10-05: deferred). Option: encrypt the `progress` blob in the app with a key in Railway variables. It is never queried server-side, so this is cheap. The key must be backed up: lose it and the data is gone. |
-| 29 | n/a | Low | Postgres | No row-level security. Isolation between athletes is enforced by the app (`state.py` always filters by the session's `user.id`, and `tests/test_state.py` proves it). | **Open** (decided 2026-10-05: deferred). RLS only means something now that the app no longer connects as a superuser (#22). Next step would be a policy on `user_state` keyed on a per-request `SET app.user_id`. |
+| 1 | PRIV-1, PRIV-2 | High | `public/privacy.html` | Users are 10–18 and the app stores names, journal text, self-ratings and coach chat. The privacy page is a **DRAFT placeholder**, and under-13 users trigger US COPPA. Data staying on-device reduces but does not remove the obligation. | **Owner**: the school supplies the policy text and decides the under-13 approach. |
+| 2 | FE-3 | Medium | `public/screens/modules.js`, `public/data/lessons.js` | Module locks are client-side only, and all lesson content ships to every browser. Fine for a free beta; blocks charging money. | **Open** (student): needs a server to be real. |
+| 3 | FE-5 | Medium | `public/screens/*.js` | ~490 inline `style=` attributes, which force `'unsafe-inline'` in the style CSP. | **Open**: move to classes in `style.css`; then tighten `style-src`. |
+| 4 | FE-4 | Low | `public/style.css`, `public/screens/*.js` | `outline: none` with no `:focus-visible` replacement; inputs use placeholders instead of `<label>`. | **Open** |
+| 5 | OPS-6 | Medium | n/a | No error tracking or uptime monitoring. | **Open**: an uptime monitor on `/api/health` is the cheap half. |
+| 6 | OPS-3, OPS-4 | n/a | GitHub settings | Secret scanning, push protection, and branch protection requiring CI. | **Owner** |
+| 7 | OPS-1 | n/a | Railway settings | Turn on "Wait for CI" so a red build never deploys. | **Owner** |
+| 8 | FE-7 | Low | `public/utils/storage.js` | All progress stays in `localStorage` with no way to clear it from the UI. On a shared device the next person sees the previous athlete's journal. | **Open** (student): a "Reset my data" control. Was previously covered by sign-out; that went away with accounts. |
 
-> **Round 1 hardening (2026-10-05)** closed #21 and #24. Still open, out of that round: email
-> verification (#20), focus styles and labels (#18), inline styles (#19), server-side paywall (#12),
-> Sentry/uptime (#13), field-level encryption (#28), and RLS (#29).
+## Satisfied by the current build
 
-## How to grant demo mode
+| Rule | How | Proved by |
+|---|---|---|
+| FE-1 | `escapeHtml` applied at every site where athlete text reaches `innerHTML` | manual XSS probe: a name of `<img src=x onerror=…>` renders as text and does not execute |
+| FE-2 | No secrets in client code; the demo-mode passphrase was removed, not hidden | `git grep` for credential patterns |
+| API-3 | 500s return a request id, never a stack trace | `server.js` error handler |
+| API-4 | CSP (strict `script-src`), HSTS in prod, `X-Frame-Options: DENY`, nosniff, Referrer-Policy, no framework header | `npm run smoke` asserts each one |
+| API-8 | Client `X-Request-ID` validated against `^[A-Za-z0-9-]{1,64}$` before use | `server.js` |
+| API-9 | `/api/health` returns `{"status":"ok"}` and nothing else | `npm run smoke` |
+| API-10 | Production refuses to boot on `ALLOWED_HOSTS=*` or an `http://` base URL | verified by running it |
+| LIC-1 | PolyForm Noncommercial 1.0.0, and `package.json` agrees | `LICENSE.md` |
+| OPS-1, OPS-2 | CI runs import check, smoke test and `npm audit`; lockfile committed; Dependabot grouped weekly | `.github/` |
 
-```sql
-UPDATE users SET is_superuser = true WHERE email = 'founder@example.com';
-```
-Users can't set this flag on themselves (`PATCH /users/me` ignores it).
+## Not applicable to this architecture
+
+`DB-1`…`DB-9` (no database), `AUTH-1`…`AUTH-8` (no accounts, no sessions, no
+passwords), `API-1` (no object IDs), `API-2` (no request bodies), `API-5` (no CORS —
+same origin), `API-6` (no state-changing routes), `API-7` (no uploads), `OPS-5` (no
+database or secrets to separate per environment).
+
+These become live again the moment a feature needs a server. Anything in that direction
+should be specced first — see `ROADMAP.md`.
+
+## History
+
+**2026-10-05 audit and hardening.** A full audit against the then-current FastAPI
+backend found 29 items; the fixes that still apply are in the satisfied table above.
+The backend-specific work — hashed session tokens (DB-8), a least-privilege Postgres
+role (DB-6), credential-endpoint rate limiting (AUTH-3), password-gated account changes
+and self-service deletion (AUTH-5/6), the cross-site write block (API-6) — went away
+with the backend on 2026-10-07. It is preserved in git history, and in
+`~/.claude/skills/production-standard/assets/templates/fastapi/`, if accounts are ever
+rebuilt.
+
+**2026-10-07 rollback.** The app returned to the student's `localStorage` design;
+accounts, server-side sync and the FastAPI backend were removed as assistant-written
+feature work. Two consequences worth recording:
+
+- **Finding #28 (minors' journals unencrypted in Postgres, raised to High under DB-9 on
+  2026-10-07) is resolved by removal.** There is no database. The same data now sits in
+  `localStorage`, which is why FE-7 above replaces it.
+- **Demo mode was deleted, not fixed.** It was the student's feature, gated behind a
+  passphrase committed to a public repo (FE-2), and the server-side gate that replaced
+  it died with the backend. Deleting a student feature is a deviation from "features
+  belong to the student", taken because the alternative was restoring a burned secret.
+  It should be re-specced with server enforcement when the paid tier is built.

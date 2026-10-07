@@ -6,12 +6,16 @@ codebase, updated as of the redesign/bug-fix pass on 2026-07-31.
 
 ## Current State
 
-**Stack**: Vanilla HTML/CSS/JS frontend (no build step, no framework) served by a
-FastAPI backend, with Postgres behind it, deployed on Railway. Athletes have real
-email/password accounts; profile, XP, streaks, badges, journal entries and chat
-history live in Postgres as a JSON document per athlete and follow them to any
-device. The frontend's storage API stayed synchronous — it reads an in-memory
-cache hydrated once at boot and writes back on a debounce (see README).
+**Stack**: Vanilla HTML/CSS/JS, no build step, no framework. Everything — profile, XP,
+streaks, badges, journal entries, chat history — lives in `localStorage` on one
+device/browser. A small Node server (`server.js`) serves the app with security headers;
+it holds no data and exposes no API beyond a health check.
+
+> **Note, 2026-10-07.** Accounts, server-side progress sync and a FastAPI backend were
+> built by the teaching assistant in September and **rolled back**, because features are
+> the student's to spec and implement. The hardening and deployment work stayed. The
+> code is in git history if it is useful as a reference — but if cross-device sync is
+> wanted, spec it first. See `docs/STACK-COMPARISON.md` for what a backend costs.
 
 **Content**: Modules 1–3 (9 lessons) are fully built — hook, instruction, activity,
 quiz, and tie-in sections for each, per the schema in `data/lessons.js`. Modules 4–7
@@ -27,16 +31,16 @@ AI Coach + schedule sync + full tracking behind a `MindRep+` paid tier ($20–30
   unlock locked modules but the click handlers weren't attached — dead clicks. Fixed.
 - "Upgrade to Premium" was a dead button. It now opens a waitlist modal that stores an
   email in `localStorage` (`waitlist_email`) — not a real payment flow, see Phase 3.
+- Renamed "Admin Access" → "Demo Mode" in the UI so it's not presented as real
+  security — it isn't; the passphrase ships in plaintext client-side JS
+  (`utils/admin.js`) and always will unless gating logic and content genuinely live
+  server-side. See Phase 3. *(Demo mode was later removed entirely — 2026-10-07.)*
 - Sample trend charts on the Tracker screen displayed identical placeholder data for
   two different charts. Game-log emoji was hardcoded to ⚽ regardless of the athlete's
   actual sport. Game reminders only ever showed an in-app banner, never a system
   notification, even with permission granted — now fires a real `Notification` when
   the tab is open (see "Known limitations" below for why "closed app" reminders need
   a backend).
-- Renamed "Admin Access" → "Demo Mode" in the UI so it's not presented as real
-  security — it isn't; the passphrase ships in plaintext client-side JS
-  (`utils/admin.js`) and always will unless gating logic and content genuinely live
-  server-side. See Phase 3.
 
 **Visual design**: Added `utils/illustrations.js` — a set of custom inline-SVG
 illustrations (hero motif, per-module icons, Coach Neutral avatar, sport icons) themed
@@ -50,15 +54,10 @@ teammate photos, etc.) can drop in later without restructuring the screens.
 These are honest gaps in a client-only prototype, not bugs to "fix" without more
 infrastructure:
 
-- ~~**No accounts / no cross-device sync.**~~ **Done.** Accounts, sessions and
-  server-side progress shipped with the FastAPI backend. Clearing browser data no
-  longer wipes progress. The proposal's "SYNC" pillar (schedule-aware content) is
-  now unblocked — the backend it needed exists.
-- **Progress sync is last-write-wins.** Two devices used at the same time means the
-  later write silently wins. Fine for one athlete's own progress; revisit if
-  coach/parent accounts ever write to the same document.
-- **Password reset needs a verified Resend domain.** Until one is configured, reset
-  emails only reach the Resend account owner's address.
+- **No accounts / no cross-device sync.** Clearing browser data wipes all progress, and
+  there is no way to log in on a second device. The proposal's "SYNC" pillar
+  (schedule-aware content) needs a backend to store a calendar and push content on a
+  schedule, which a static page can't do.
 - **No real push notifications.** `Notification` only fires while the app tab is open
   in a browser. Actually reminding someone when the app/browser is closed requires a
   service worker + push subscription + a server to trigger the push.
@@ -67,15 +66,11 @@ infrastructure:
   as a paid differentiator needs a real model integration.
 - **No real payments.** The waitlist modal collects an email in `localStorage`; there's
   no Stripe/payment processor wired up.
-- **Gating is still client-side.** Demo mode is now limited to accounts with
-  `is_superuser` (the old passphrase was public and should be considered burned),
-  but module gating itself still isn't real: lesson content still
-  ships to every browser in `data/lessons.js`, and `locked` flags are enforced in
-  client code. Moving paid content behind an authenticated endpoint is the remaining
-  work before MindRep+ can charge anyone.
-
-## Phase 1 — MVP Polish (now)
-
+- **Gating is still client-side.** Module locks live in `data/lessons.js` and are
+  enforced in the browser, so all lesson content ships to everyone. Demo mode was
+  removed entirely on 2026-10-07: it was unlocked by a passphrase committed to this
+  public repo, so that passphrase is burned. Re-spec both together when the paid tier
+  is built — a paywall that the client enforces is not a paywall.
 - [x] Fix free-tier gating so Modules 1–3 are actually reachable (this pass)
 - [x] Fix the dead Premium CTA, sample-chart bug, sport-emoji bug, demo-mode framing
 - [x] Illustration system + "new look" pass across onboarding/home/modules/lesson/coach/share-card
@@ -104,10 +99,12 @@ paid tier for free.
 
 The things that can't be faked client-side, roughly in the order they unblock each
 other:
-1. ~~**Backend + accounts**~~ — **done.** FastAPI + Postgres on Railway, with
-   email/password accounts, revocable cookie sessions and password reset. Progress
-   syncs across devices. Note that *gating* is not yet real: see "Demo mode isn't
-   security" above — paid lessons still ship to the client.
+1. **Backend + accounts** — needed for cross-device progress and to make gating real
+   instead of client-side-fakeable. This was built once and rolled back (see the note
+   at the top); the previous implementation is in git history and the generic starter
+   lives in the `production-standard` skill's FastAPI template. **Spec it before
+   building it**: what an account is for, what happens to existing on-device progress,
+   and who can see an athlete's data.
 2. **Real payments** — Stripe (or similar) checkout for MindRep+, replacing today's
    waitlist-email placeholder
 3. **Schedule sync** — the proposal's actual differentiator: let athletes input
@@ -123,11 +120,9 @@ other:
 
 ## Verification Checklist
 
-Run the app locally (see README.md — `uv run uvicorn app.main:app --reload`) and
+Run the app locally (see README.md — `npm run dev`) and
 click through. Start by registering a fresh account:
-- Register → onboarding (name → sport → age) → home
-- Sign out, sign back in: progress must still be there (it comes from Postgres now,
-  not localStorage)
+- Onboarding (name → sport → age) → home
 - Onboarding (name → sport → age) with the new hero illustration
 - Home hero + module-journey cards (icons render, Modules 2 & 3 show as unlocked)
 - Modules screen: Modules 1–3 open and their lessons are clickable; Modules 4–7 show

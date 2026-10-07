@@ -2,10 +2,13 @@
 
 import { MODULES } from '../data/lessons.js';
 import { getProgress, storage } from '../utils/storage.js';
-import { isAdmin } from '../utils/admin.js';
 import { showToast } from '../utils/gamification.js';
 import { moduleIcon } from '../utils/illustrations.js';
 import { escapeHtml } from '../utils/escape.js';
+
+// Demo mode was removed: the passphrase that unlocked it shipped in this public
+// repo (Production Standard FE-2), so it is burned. Re-spec it with server-side
+// enforcement when the paid tier is built — see ROADMAP.md.
 
 // Modules no longer get a distinct rainbow color each — the design system
 // uses one accent color (mint/teal) reserved for progress/active state, with
@@ -21,7 +24,7 @@ export function renderModules(navigate) {
   const progress     = getProgress();
   const completed    = progress.completedLessons || [];
   const completedMods = progress.completedModules || [];
-  const admin        = isAdmin();
+  const admin = false;
 
   const totalLessons = MODULES.reduce((s, m) => s + m.lessons.length, 0);
   const totalDone    = completed.length;
@@ -144,7 +147,7 @@ export function renderModules(navigate) {
 }
 
 export function attachModulesEvents(navigate) {
-  const admin = isAdmin();
+  const admin = false;
   MODULES.forEach(mod => {
     if (!admin && mod.locked) return;
     mod.lessons.forEach(lesson => {

@@ -1,9 +1,9 @@
 # Production Standard OPS-2: weekly dependency updates, all in ONE pull request.
 #
-# Every ecosystem joins the same multi-ecosystem group, so Python and GitHub
-# Actions updates land together. One PR also means uv.lock is regenerated once,
-# against the final pyproject.toml. Separate PRs (merged one by one, or via
-# "Update branch") produced a lockfile that broke Railway's `uv sync --locked`.
+# Every ecosystem joins the same multi-ecosystem group, so npm and GitHub
+# Actions updates land together and package-lock.json is regenerated once,
+# against the final package.json. Separate PRs merged one at a time produce
+# lockfiles that drift from the manifest.
 #
 # If a grouped PR falls behind main, comment `@dependabot rebase` rather than
 # clicking "Update branch", so the lockfile is rebuilt instead of text-merged.
@@ -16,7 +16,7 @@ multi-ecosystem-groups:
       interval: "weekly"
 
 updates:
-  - package-ecosystem: "uv"
+  - package-ecosystem: "npm"
     directory: "/"
     patterns: ["*"]
     multi-ecosystem-group: "all-dependencies"
