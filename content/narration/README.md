@@ -18,7 +18,22 @@ read-along under the player. The activity, quiz and tie-in stay interactive afte
 | 3.2 Let Go of the Scoreboard | [✓](3.2-let-go-of-the-scoreboard.md) | `3.2-let-go-of-the-scoreboard.mp3` | ☐ | ☐ | ☐ | ☐ |
 | 3.3 The 90-Second Rule | [✓](3.3-the-90-second-rule.md) | `3.3-the-90-second-rule.mp3` | ☐ | ☐ | ☐ | ☐ |
 
-## Recording workflow
+## Recording with the script (recommended)
+
+`scripts/narrate.py` does the workflow below through the ElevenLabs API: one call per
+`[pause]`-separated segment, real silence for the pauses, baked-in fades, leveling, and a
+mono AAC file in `public/audio/lessons/<slug>.m4a`. Takes are cached in `takes/`
+(gitignored), so only new or redone segments cost characters.
+
+1. Put `ELEVENLABS_API_KEY=...` in the repo's `.env`.
+2. `uv run scripts/narrate.py voices`, then `audition <id> <id> <id>` and have peers pick
+   from `takes/audition/voice-A.m4a`… blind. Put the winner's ID in `voice.json`.
+3. `uv run scripts/narrate.py make 1.1 --dry-run` to see segments and cost, then
+   `make 1.1` and `listen 1.1`.
+4. Redo a line you don't like with `make 1.1 --redo 3`, hear takes with
+   `listen 1.1 3 --take 2`, keep one with `make 1.1 --pick 3=2`.
+
+## Recording by hand
 
 1. **Pick the voice once, for all nine.** Generate Part 1 of lesson 1.1 in 2–3 candidate
    voices, and have a couple of peers pick without knowing which is which. Choose warm,
