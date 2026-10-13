@@ -1,12 +1,13 @@
 {
-  "voice_id": "",
+  "voice_id": "uhYnkYTBc711oAY590Ea",
   "model_id": "eleven_v4",
   "voice_settings": {
-    "stability": 0.35,
-    "similarity_boost": 0.78,
+    "stability": 0.5,
+    "similarity_boost": 0.8,
     "style": 0,
-    "speed": 1.0,
+    "speed": 0.92,
     "use_speaker_boost": true
   },
-  "stitch": true
+  "stitch": true,
+  "voice_name": "Charlotte - Meditation & Relaxation (Voice Library); backup: Drew wgHvco1wiREKN0BdyVx5"
 }
